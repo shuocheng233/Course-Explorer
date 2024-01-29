@@ -12,8 +12,8 @@
 | Member1     |    mx21@illinois.edu   |
 | Member2     |      Benjamin Liang    |
 | Member2     |         bl45           |
-| Member3     |                        |
-| Member3     |                        |
+| Member3     |      Shuo Cheng        |
+| Member3     |  shuoc4@illinois.edu   |
 
 ## Project Information
 
