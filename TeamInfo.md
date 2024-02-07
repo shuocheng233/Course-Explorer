@@ -24,5 +24,4 @@
 | Video Link  |      link_to_video     |
 
 ## Project Summary
-
-This is a summary of the project!
+Our project will combine data from the UIUC course explorer along with Wade’s GPA datasets to provide an enhanced course selection experience. We are able to use data from the gpa datasets, along with possibly adding a crowdsourced course rating feature to allow students to make more informed decisions:
