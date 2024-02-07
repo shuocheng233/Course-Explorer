@@ -1,4 +1,4 @@
-# team081
+# team081 - Course Explorer++
 
 ## Basic Information
 
