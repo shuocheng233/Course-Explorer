@@ -5,15 +5,14 @@ const UsersList = ({ url }) => {
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
-
     useEffect(() => {
         const fetchAllUsers = async () => {
             try {
                 const res = await fetch(url)
                 const data = await res.json()
+                console.log(data)
                 setLoading(false)
-                setUsers(data.message)
-                console.log(users)
+                setUsers(data)
             } catch (err) {
                 setError(err.message)
                 setLoading(false)
@@ -45,7 +44,7 @@ const UsersList = ({ url }) => {
             <div>
                 <ul>
                     {users.map((dict) => {
-                      return <li>{dict["subject"]}</li>
+                      return <li>{dict["subject"]}, {dict["courses"]}, {dict["average"]}, {dict["favorite"]}</li>
                     })}
                 </ul>
             </div>

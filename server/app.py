@@ -47,13 +47,12 @@ db = init_connection_engine()
 
 @app.route("/")
 def homepage():
-    """ returns rendered homepage """
     conn = db.connect()
-    query = "SELECT * FROM (SELECT r.Subject, COUNT(*) AS NumberOfCourses, AVG(r.Rating) AS AverageRating, COUNT(*) AS NumberOfFavorite FROM Rating r JOIN Favorite f ON r.Subject = f.Subject GROUP BY r.Subject) a ORDER BY Subject LIMIT 15;"
+    query = "SELECT * FROM (SELECT r.Subject, COUNT(*) AS NumberOfCourses, AVG(r.Rating) AS AverageRating, COUNT(*) AS NumberOfFavorite FROM Rating r JOIN Favorite f ON r.Subject = f.Subject GROUP BY r.Subject) a ORDER BY Subject;"
     query_results = conn.execute(text(query)).fetchall()
     conn.close()
     # print(query_results)
-    ret = []
+    ret = [{'subject':'subject','courses':'courses','average':'average','favorite':'favorite'}]
     for result in query_results:
         item = {
             "subject": result[0],
