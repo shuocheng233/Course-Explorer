@@ -44,7 +44,7 @@ const UsersList = ({ url }) => {
             <div>
                 <ul>
                     {users.map((user, index) => {
-                      <li key={index}>{user.name}: {user.email}</li>
+                      return <li key={index}>{user.name}: {user.email}</li>
                     })}
                 </ul>
             </div>

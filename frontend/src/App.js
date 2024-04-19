@@ -1,16 +1,20 @@
 import './App.css';
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import UsersList from './components/UsersList'
+import HomePage from './components/home/HomePage';
 
 function App() {
-  const BASE_URL = ""
+  const BASE_URL = "http://localhost"
   const PORT = 5000
-  const apiUrl=`${BASE_URL}:${PORT}/view`
+  const apiUrl=`${BASE_URL}:${PORT}/`
 
   return (
-    <Routes>
-      <Route path="/users" element={<UsersList url={apiUrl} />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/users" element={<UsersList url={apiUrl} />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
