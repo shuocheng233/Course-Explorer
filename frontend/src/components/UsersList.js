@@ -13,6 +13,7 @@ const UsersList = ({ url }) => {
                 const data = await res.json()
                 setLoading(false)
                 setUsers(data.message)
+                console.log(users)
             } catch (err) {
                 setError(err.message)
                 setLoading(false)
@@ -35,21 +36,21 @@ const UsersList = ({ url }) => {
         )
     }
 
-    if (!users.length) {
-        return (
-            <div>Sorry, the cupboard is bare!</div>
-        )
-    } else {
+    // if (!users.length) {
+    //     return (
+    //         <div>Sorry, the cupboard is bare!</div>
+    //     )
+    // } else {
         return (
             <div>
                 <ul>
-                    {users.map((user, index) => {
-                      return <li key={index}>{user.name}: {user.email}</li>
+                    {users.map((dict) => {
+                      return <li>{dict["subject"]}</li>
                     })}
                 </ul>
             </div>
         )
-    }
+    // }
 }
 
 export default UsersList
