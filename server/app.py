@@ -51,7 +51,7 @@ def homepage():
     query = "SELECT * FROM (SELECT r.Subject, COUNT(*) AS NumberOfCourses, AVG(r.Rating) AS AverageRating, COUNT(*) AS NumberOfFavorite FROM Rating r JOIN Favorite f ON r.Subject = f.Subject GROUP BY r.Subject) a ORDER BY Subject;"
     query_results = conn.execute(text(query)).fetchall()
     conn.close()
-    # print(query_results)
+    print(query_results)
     ret = [{'subject':'subject','courses':'courses','average':'average','favorite':'favorite'}]
     for result in query_results:
         item = {
@@ -97,9 +97,9 @@ def signup():
     password = data['password']
     firstName = data['firstName']
     lastName = data['lastName']
-    conn = db.connect()
-    query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
     try:
+        conn = db.connect()
+        query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
         conn.execute(text(query))
         conn.close()
         return "OK", 200
@@ -107,4 +107,38 @@ def signup():
         conn.close()
         return "Could not query database", 400
     
+@app.route("/showFavorite")
+def showFavorite():
+    global netID
+    if netID == '':
+        return "Not Logged In", 400
     
+    try:
+        conn = db.connect()
+        query = f"SELECT * FROM Favorite WHERE NetID = {netID};"
+        result = conn.execute(text(query)).fetchall()
+        conn.close()
+        return result, 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+    
+@app.route("/addFavorite", methods = ["POST"])
+def addFavorite():
+    global netID
+    if netID == "":
+        return "Not Logged In", 400
+    data = request.json
+    primaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    try:
+        conn = db.connect()
+        query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
