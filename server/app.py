@@ -6,7 +6,7 @@ from sqlalchemy import text
 from yaml import load, Loader
 from flask_cors import CORS
 
-
+netID = ""
 
 def init_connection_engine():
     """ initialize database setup
@@ -63,3 +63,48 @@ def homepage():
         ret.append(item)
     print(ret)
     return ret
+
+@app.route("/login", methods=["POST"])
+def login():
+    global netID
+    data = request.json
+    pre_netID = data['netID']
+    password = data['password']
+    
+    conn = db.connect()
+    query = 'select * from User where netID = "{}" and password = "{}";'.format(netID, password)
+    try:
+        query_results = conn.execute(text(query)).fetchall()
+    except:
+        conn.close()
+        return 'QUERY FAILED', 400
+    if query_results is None:
+        conn.close()
+        return 'USER DOES NOT EXIST', 400
+    else:
+        netID = pre_netID
+        conn.close()
+        return 'OK' ,200 
+        # can also decide to return first, lastname
+
+
+
+@app.route("/signup", methods = ["POST"])
+def signup():
+    data = request.json
+    print(data)
+    netID = data['netID']
+    password = data['password']
+    firstName = data['firstName']
+    lastName = data['lastName']
+    conn = db.connect()
+    query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
+    try:
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+    

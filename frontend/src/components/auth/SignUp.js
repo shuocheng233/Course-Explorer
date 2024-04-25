@@ -50,7 +50,7 @@ const SignUp = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ netID })
+                body: JSON.stringify({ netID, password, firstName, lastName })
             })
             const data = await res.json()
             
