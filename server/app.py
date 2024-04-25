@@ -198,7 +198,7 @@ def getCourses():
         return "Could not query database", 400
     
 @app.route("/getSections", methods=['POST'])
-def getCourses():
+def getSections():
     data = request.json
     yearTerm = '2024-sp'
     if "yearTerm" in data:
