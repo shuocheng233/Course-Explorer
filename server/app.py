@@ -142,3 +142,40 @@ def addFavorite():
     except:
         conn.close()
         return "Could not query database", 400
+    
+@app.route("/addRating", methods = ["POST"])
+def addRating():
+    global netID
+    if netID == "":
+        return "Not Logged In", 400
+    data = request.json
+    primaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    rating = data['rating']
+    comments = data['comments']
+    try:
+        conn = db.connect()
+        query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{rating}', '{comments}');"
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+@app.route("/showRatings")
+def showRatings():
+    global netID
+    if netID == '':
+        return "Not Logged In", 400
+    
+    try:
+        conn = db.connect()
+        query = f"SELECT * FROM Rating WHERE NetID = {netID};"
+        result = conn.execute(text(query)).fetchall()
+        conn.close()
+        return result, 200
+    except:
+        conn.close()
+        return "Could not query database", 400
