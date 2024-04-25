@@ -143,6 +143,25 @@ def addFavorite():
         conn.close()
         return "Could not query database", 400
     
+@app.route("/deleteFavorite", methods = ["POST"])
+def deleteFavorite():
+    global netID
+    if netID == "":
+        return "Not Logged In", 400
+    data = request.json
+    primaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    try:
+        conn = db.connect()
+        query = f"DELETE FROM Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
 @app.route("/addRating", methods = ["POST"])
 def addRating():
     global netID
@@ -157,6 +176,48 @@ def addRating():
     try:
         conn = db.connect()
         query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{rating}', '{comments}');"
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+@app.route("/deleteRating", methods = ["POST"])
+def deleteRating():
+    global netID
+    if netID == "":
+        return "Not Logged In", 400
+    data = request.json
+    primaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    # rating = data['rating']
+    # comments = data['comments']
+    try:
+        conn = db.connect()
+        query = f"DELETE FROM Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
+        conn.execute(text(query))
+        conn.close()
+        return "OK", 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+@app.route("/updateRating", methods = ["POST"])
+def updateRating():
+    global netID
+    if netID == "":
+        return "Not Logged In", 400
+    data = request.json
+    primaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    new_rating = data['rating']
+    new_comments = data['comments']
+    try:
+        conn = db.connect()
+        query = f"Update Rating set Rating = '{new_rating}', Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
         conn.execute(text(query))
         conn.close()
         return "OK", 200
@@ -210,6 +271,25 @@ def getSections():
         query = f"SELECT * FROM Section WHERE Subject = {subject} AND Number = {number} AND YearTerm = {yearTerm};"
         result = conn.execute(text(query)).fetchall()
         conn.close()
+        return result, 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+@app.route("/getCourseRatings", methods=['POST'])
+def getCourseRatings():
+    data = request.json
+    subject = data['subject']
+    number = data['number']
+    primaryInstructor = data['primaryInstructor']
+    try:
+        conn = db.connect()
+        GPA = f"SELECT FullName, GPA FROM GPAByInstructor WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {primaryInstructor};"
+        Rating = f"SELECT NetID, Rating, Comments FROM Rating WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {primaryInstructor};"
+        GPA = conn.execute(text(GPA)).fetchall()
+        Rating = conn.execute(text(Rating)).fetchall()
+        conn.close()
+        result = {"GPA": GPA, "Ratings": Rating}
         return result, 200
     except:
         conn.close()
