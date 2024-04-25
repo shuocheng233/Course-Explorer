@@ -33,8 +33,6 @@ const Login = () => {
                 body: JSON.stringify({ netID, password })
             })
 
-            setLoading(false)
-
             if (res.ok) {
                 setError("")
                 const data = await res.json()
@@ -48,8 +46,9 @@ const Login = () => {
                 }
             }
         } catch (error) {
-            setLoading(false)
             setError("Network error. Please check your connection and try again.")
+        } finally {
+            setLoading(false)
         }
     }
 
