@@ -179,3 +179,34 @@ def showRatings():
     except:
         conn.close()
         return "Could not query database", 400
+    
+@app.route("/getCourses", methods=['POST'])
+def getCourses():
+    data = request.json
+    yearTerm = data['yearTerm']
+    subject = data['subject']
+    try:
+        conn = db.connect()
+        query = f"SELECT DISTINCT Subject, Number, CourseTitle FROM Section WHERE Subject = {subject} AND YearTerm = {yearTerm};"
+        result = conn.execute(text(query)).fetchall()
+        conn.close()
+        return result, 200
+    except:
+        conn.close()
+        return "Could not query database", 400
+    
+@app.route("/getSections", methods=['POST'])
+def getCourses():
+    data = request.json
+    yearTerm = data['yearTerm']
+    subject = data['subject']
+    number = data['number']
+    try:
+        conn = db.connect()
+        query = f"SELECT * FROM Section WHERE Subject = {subject} AND Number = {number} AND YearTerm = {yearTerm};"
+        result = conn.execute(text(query)).fetchall()
+        conn.close()
+        return result, 200
+    except:
+        conn.close()
+        return "Could not query database", 400
