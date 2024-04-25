@@ -183,7 +183,9 @@ def showRatings():
 @app.route("/getCourses", methods=['POST'])
 def getCourses():
     data = request.json
-    yearTerm = data['yearTerm']
+    yearTerm = '2024-sp'
+    if "yearTerm" in data:
+        yearTerm = data['yearTerm']
     subject = data['subject']
     try:
         conn = db.connect()
@@ -198,7 +200,9 @@ def getCourses():
 @app.route("/getSections", methods=['POST'])
 def getCourses():
     data = request.json
-    yearTerm = data['yearTerm']
+    yearTerm = '2024-sp'
+    if "yearTerm" in data:
+        yearTerm = data['yearTerm']
     subject = data['subject']
     number = data['number']
     try:
