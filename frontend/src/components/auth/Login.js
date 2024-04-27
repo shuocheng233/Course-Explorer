@@ -36,6 +36,11 @@ const Login = () => {
             if (res.ok) {
                 setError("")
                 const data = await res.json()
+                
+                // store data in localStorage
+                localStorage.setItem('netID', netID)
+                localStorage.setItem('firstName', data.firstName)
+                localStorage.setItem('lastName', data.lastName)
                 navigate('/home') // navigate to home page on successful login
 
             } else {
@@ -53,7 +58,7 @@ const Login = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="login-form" onSubmit={handleSubmit}>
             <div className="welcome-message">
                 <h2>Welcome to Course Explorer :)</h2>
                 <p>Please log in to continue.</p>

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import API_URLS from '../../config/config'
 import { useNavigate } from 'react-router-dom'
+import './AuthPage.css'
 
 const SignUp = () => {
     const firstNameRef = useRef(null)
@@ -56,8 +57,12 @@ const SignUp = () => {
             
             if (res.ok) {
                 // assume the user has been added to the database successfully
+                // store the user data in localStorage
                 // navigate to the dashboard upon successful registration
                 setError("")
+                localStorage.setItem('netID', netID)
+                localStorage.setItem('firstName', firstName)
+                localStorage.setItem('lastName', lastName)
                 navigate('/home')
             } else {
                 setError(data.message)
@@ -70,52 +75,56 @@ const SignUp = () => {
     }
 
   return (
-    <form onSubmit={handleSubmit}>
-        <div className="form-group">
-            <label htmlFor="firstName" className="form-label">First Name</label>
-            <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                ref={firstNameRef}
-                required
-            />
-        </div>
-        <div className="form-group">
-            <label htmlFor="lastName" className="form-label">Last Name</label>
-            <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                ref={lastNameRef}
-                required
-            />
-        </div>
-        <div className="form-group">
-            <label htmlFor="netID" className="form-label">NetID</label>
-            <input
-                type="text"
-                id="netID"
-                name="netID"
-                ref={netIDRef}
-                required
-            />
-        </div>
-        <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                ref={passwordRef}
-                required
-            />
-        </div>
-        {error && <div className="error">{error}</div>}
-        <button type="submit" className="btn" disabled={loading}>
-            {loading ? 'Processing...' : 'Sign Up'}
-        </button>
-    </form>
+        <form className="signup-form" onSubmit={handleSubmit}>
+            <h1>Welcome to Course Explorer :)</h1>
+            <h2>Sign Up</h2>
+            <div className="form-group">
+                <label htmlFor="firstName" className="form-label">First Name</label>
+                <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    ref={firstNameRef}
+                    required
+                />
+            </div>
+            <div className="form-group">
+                <label htmlFor="lastName" className="form-label">Last Name</label>
+                <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    ref={lastNameRef}
+                    required
+                />
+            </div>
+            <div className="form-group">
+                <label htmlFor="netID" className="form-label">NetID</label>
+                <input
+                    type="text"
+                    id="netID"
+                    name="netID"
+                    ref={netIDRef}
+                    required
+                />
+                <small>NetID can only include lowercase letters and digits.</small>
+            </div>
+            <div className="form-group">
+                <label htmlFor="password" className="form-label">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    ref={passwordRef}
+                    required
+                />
+                <small>Password must be 3-100 characters long and can include special characters.</small>
+            </div>
+            {error && <div className="error">{error}</div>}
+            <button type="submit" className="btn" disabled={loading}>
+                {loading ? 'Processing...' : 'Sign Up'}
+            </button>
+        </form>
   )
 }
 

@@ -3,7 +3,7 @@ import Login from './Login'
 import SignUp from './SignUp'
 import './AuthPage.css'
 
-const LoginPage = ({ showLogin }) => {
+const AuthPage = ({ showLogin }) => {
     return (
         <div className="container">
             <div className="left-box">
@@ -17,4 +17,4 @@ const LoginPage = ({ showLogin }) => {
     )
 }
 
-export default LoginPage
+export default AuthPage
