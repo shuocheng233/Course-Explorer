@@ -3,6 +3,7 @@ const API_URLS = {
     signup: 'http://127.0.0.1:5000/signup', // Endpoint for user sign up requests
     // getAllSubjects: 'http://127.0.0.1:5000/getAllCourses', // Endpoint for getting all subjects
     // section: 'http://127.0.0.1:5000/getSections', // Endpoint for getting a specific section
+    favorites: 'http://127.0.0.1:5000/showFavorite',
 }
 
 export default API_URLS

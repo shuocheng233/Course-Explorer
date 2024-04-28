@@ -1,24 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import './Header.css';
+import React, { useEffect, useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { useNavigate } from 'react-router-dom'
+import './Header.css'
 
 const Header = () => {
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-    const [username, setUsername] = useState("");
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false)
+    const [username, setUsername] = useState("Guest")
+    const navigate = useNavigate()
 
     let content
     useEffect(() => {
-        const firstName = localStorage.getItem('firstName');
-        const lastName = localStorage.getItem('lastName');
+        const firstName = localStorage.getItem('firstName')
+        const lastName = localStorage.getItem('lastName')
         if (firstName && lastName) {
-            setUsername(`${firstName} ${lastName}`);
+            setUsername(`${firstName} ${lastName}`)
         }
-    }, []);
+    }, [])
 
     const toggleDropdown = () => {
-        setIsDropdownVisible(prev => !prev);
-    };
+        setIsDropdownVisible(prev => !prev)
+    }
+
+    const logout = () => {
+        localStorage.removeItem('netID')
+        localStorage.removeItem('firstName')
+        localStorage.removeItem('lastName')
+        navigate('/login')
+    }
 
     return (
         <header className='header'>
@@ -27,13 +36,13 @@ const Header = () => {
                 <FontAwesomeIcon icon={faUser} /> {username || 'Guest'}
                 {isDropdownVisible && (
                     <div className='dropdown'>
-                        <button>My Favorite Courses</button>
-                        <button>Logout</button>
+                        <button onClick={() => navigate('/favorites')}>My Favorite Courses</button>
+                        <button onClick={logout}>Logout</button>
                     </div>
                 )}
             </button>
         </header>
-    );
+    )
 }
 
-export default Header;
+export default Header
