@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
+import API_URLS from '../../config/config'
 import './Header.css'
 
 const Header = () => {
@@ -26,6 +27,7 @@ const Header = () => {
         localStorage.removeItem('netID')
         localStorage.removeItem('firstName')
         localStorage.removeItem('lastName')
+        fetch(API_URLS.logout)
         navigate('/login')
     }
 

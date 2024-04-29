@@ -109,6 +109,12 @@ def signup():
         conn.close()
         return f"Account with NetID '{netID}' already exists", 401
     
+@app.route("/logout")
+def logout():
+    global netId
+    netId = ""
+    return "", 200
+    
 @app.route("/showFavorite")
 def showFavorite():
     global netID
