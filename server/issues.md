@@ -1,25 +1,33 @@
 In app.py
 
-Line 68 - 75: netID is not assigned a value before using (which actually makes the query "...where netID = "" and ...")
+For /getSections, the frontend will return an object
+```javascript
+{ year, term, number, subject }
+```
+Consider  the suer may input only some fields, the object may also contain fewer than expected attributes, like only ```{ year, subject }```. I don't know if you're good with
+```Python
+{ year: 2023, subject: 'CS' }
+```
+or
+```Python
+{ year: 2023, subject: 'CS', number: null, term: null }
+```
+Let me know!
 
-Line 118: mssing single/double quotes around {netID}
 
-Also, for all the responses, the frontend is expecting an json object (i guess frontend can't parse a raw string? At least I don't know how to), which can be achieved by the following, maybe we can try that?
+For showFavorite endpoint: 
+method should be POST with ```{ netID }```
+missing single/double quotes around {netID} in the query
 
-```python 
-return jsonify({
-
-                'firstName': some-value-here,
-
-                'lastName': some-value-here
-
-            }), 200
+Also, for all the responses, the frontend is expecting an object. For errors, you may use
+```python
+{ message: 'user does not exist' }
 ```
 
-To access the /favorites oage,
+To access the /favorites page,
 
 first log in
 
-and then click on username on the right top corner
+and then click on username on the top right corner
 
-click on my favorites courses
+click on my favorite courses
