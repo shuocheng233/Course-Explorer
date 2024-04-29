@@ -14,9 +14,10 @@ or
 ```
 Let me know!
 
+For showFavorite endpoint:
 
-For showFavorite endpoint: 
 method should be POST with ```{ netID }```
+
 missing single/double quotes around {netID} in the query
 
 Also, for all the responses, the frontend is expecting an object. For errors, you may use
