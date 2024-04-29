@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import API_URLS from '../../config/config'
+import { useNavigate } from 'react-router-dom'
 
 const Favorites = () => {
     const [courseList, setCourseList] = useState([])
     const [error, setError] = useState("")
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async () => {
             const netID = localStorage.getItem('netID')
-            console.log(netID)
 
             try {
                 const res = await fetch(API_URLS.favorites, {
@@ -40,7 +41,7 @@ const Favorites = () => {
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <ul>
                 {courseList.map((course, index) => (
-                    <li key={index}>
+                    <li key={index} onClick={() => navigate('/ratings', course)}>
                         {course.Subject} {course.Number} - {course.PrimaryInstructor}
                     </li>
                 ))}

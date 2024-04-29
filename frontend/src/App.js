@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter, Navigate, Outlet } from 'react-router-dom'
 import AuthPage from './components/auth/AuthPage';
-import Header from './components/commmon/Header'
+import Header from './components/common/Header'
 import HomePage from './components/home/HomePage'
 import Favorites from './components/favorites/Favorites';
 import './App.css'

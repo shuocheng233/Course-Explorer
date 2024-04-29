@@ -1,71 +1,51 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import API_URLS from '../../config/config'
+import { extractInfo } from './helpers'
 
 const HomePage = () => {
-    const [sections, setSections] = useState([])
-    const [selectedSubjects, setSelectedSubjects] = useState([])
     const [searchTerm, setSearchTerm] = useState("")
     const [error, setError] = useState("")
     const navigate = useNavigate()
-
-    useEffect(() => {
-        const fetchSubjects = async () => {
-            try {
-                const res = await fetch(API_URLS.getAllSubjects)
-                if (res.ok) {
-                    const data = await res.json()
-                    setSubjects(data)
-                    setSelectedSubjects(data)
-                } else {
-                    throw new Error("Unable to fetch subjects data.")
-                }
-            } catch (err) {
-                setError(err.message)
-                console.error(err)
-            }
-        }
-
-        // select distinct subject
-        // suppose the returned list if of the form [[],[],[],...]
-        fetchSubjects()
-    }, [])
 
     const handleSearchTermChange = (e) => {
         setSearchTerm(e.target.value)
     }
 
-    // function for handling form submission
-    // on submission, filter the result from subjects array
-    // store the result in selectedSubjects
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
-        let arr  = []
-        const keyword = searchTerm.trim().toLowerCase()
-        for (let i = 0; i < subjects.length; i++) {
-            const subject = subjects[i][0].trim().toLowerCase()
-            const number = subjects[i][1].trim().toLowerCase()
-            const title = subjects[i][2].trim().toLowerCase()
-            const code = subject + number
-            const codeSpaced = subject + ' ' + number
-            
-            if (subject.includes(keyword) || number.includes(keyword) || title.includes(keyword) ||
-                code.includes(keyword) || codeSpaced.includes(keyword)) {
-                arr.push(subjects[i])
-            }
+        // section format: { year, term, number, subject }
+        const section = extractInfo(searchTerm)
+
+        // Filter out null or undefined values
+        const cleanSection = Object.fromEntries(
+            Object.entries(section).filter(([key, value]) => value != null)
+        )
+
+        const queryParams = new URLSearchParams(cleanSection).toString()
+        
+        if (queryParams) {
+            navigate(`/sections?${queryParams}`)
+        } else {
+            setError("No valid data to search. Please check your input and try again.")
         }
-        setSelectedSubjects(arr)
     }
+
     return (
         <div>
-            <input
-                type="text"
-                name="search"
-                id="search"
-                placeholder="Browse Subjects"
-            
-            />
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    placeholder="Browse For Sections"
+                    value={searchTerm}
+                    onChange={handleSearchTermChange}
+                    aria-describedby="searchHelp"
+                />
+                <button type="submit">Search</button>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+            </form>
         </div>
     )
 }
