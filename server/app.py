@@ -107,7 +107,7 @@ def signup():
         return "OK", 200
     except:
         conn.close()
-        return f"User with NetID {netID} already exists", 401
+        return f"Account with NetID '{netID}' already exists", 401
     
 @app.route("/showFavorite")
 def showFavorite():

@@ -65,7 +65,7 @@ const SignUp = () => {
                 localStorage.setItem('lastName', lastName)
                 navigate('/home')
             } else {
-                setError(data.message)
+                setError(data)
             }
         } catch (error) {
             setError("Network error. Please check your connection and try again.")
