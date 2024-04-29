@@ -93,6 +93,7 @@ def login():
 
 @app.route("/signup", methods = ["POST"])
 def signup():
+    global netID
     data = request.json
     print(data)
     netID = data['netID']
@@ -102,7 +103,13 @@ def signup():
     try:
         conn = db.connect()
         query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
-        conn.execute(text(query))
+        res = conn.execute(text(query))
+        # query = f"select * from User where NetID = '{netID}' and Password = '{password}';"
+        # query_results = conn.execute(text(query)).fetchall()
+        # print('results:')
+        # for x in query_results:
+        #     print(x)
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
