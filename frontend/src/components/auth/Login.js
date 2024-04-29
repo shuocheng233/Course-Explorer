@@ -36,7 +36,7 @@ const Login = () => {
             if (res.ok) {
                 setError("")
                 const data = await res.json()
-                
+                console.log(data)
                 // store data in localStorage
                 localStorage.setItem('netID', netID)
                 localStorage.setItem('firstName', data.firstName)

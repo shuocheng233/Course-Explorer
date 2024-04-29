@@ -70,21 +70,23 @@ def login():
     data = request.json
     pre_netID = data['netID']
     password = data['password']
-    
     conn = db.connect()
-    query = 'select * from User where netID = "{}" and password = "{}";'.format(netID, password)
+    query = f"select * from User where NetID = '{pre_netID}' and Password = '{password}';"
     try:
         query_results = conn.execute(text(query)).fetchall()
     except:
         conn.close()
         return 'QUERY FAILED', 400
-    if query_results is None:
+    if len(query_results) == 0:
         conn.close()
-        return 'USER DOES NOT EXIST', 400
+        return 'USER DOES NOT EXIST', 401
     else:
         netID = pre_netID
         conn.close()
-        return 'OK' ,200 
+        return {
+            "firstName": query_results[0].FirstName,
+            "lastName": query_results[0].LastName
+        }, 200 
         # can also decide to return first, lastname
 
 
@@ -105,7 +107,7 @@ def signup():
         return "OK", 200
     except:
         conn.close()
-        return "Could not query database", 400
+        return f"User with NetID {netID} already exists", 401
     
 @app.route("/showFavorite")
 def showFavorite():

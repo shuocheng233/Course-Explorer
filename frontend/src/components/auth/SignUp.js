@@ -53,7 +53,7 @@ const SignUp = () => {
                 },
                 body: JSON.stringify({ netID, password, firstName, lastName })
             })
-            const data = await res.json()
+            const data = await res.text()
             
             if (res.ok) {
                 // assume the user has been added to the database successfully
