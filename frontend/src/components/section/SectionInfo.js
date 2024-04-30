@@ -2,7 +2,10 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import './SectionInfo.css'
 
-const SectionInfo = ({ section }) => {
+const SectionInfo = () => {
+    const location = useLocation()
+    const { section } = location.state
+
     return (
         <div className='section-info-container'>
             <div className='section-header'>
