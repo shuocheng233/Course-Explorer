@@ -122,18 +122,29 @@ def logout():
     netId = ""
     return "", 200
     
-@app.route("/showFavorite")
+@app.route("/showFavorite", methods = ["POST"])
 def showFavorite():
     global netID
+    data = request.json
+    netID = data['netID']
     if netID == '':
         return "Not Logged In", 400
     
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Favorite WHERE NetID = {netID};"
+        query = f"SELECT * FROM Favorite WHERE NetID = '{netID}';"
         result = conn.execute(text(query)).fetchall()
+        favorite_list = []
+        for res in result:
+            item = {
+                "PrimaryInstructor": res[1],
+                "Subject": res[2],
+                "Number": res[3]
+            }
+            favorite_list.append(item)
         conn.close()
-        return result, 200
+        
+        return favorite_list, 200
     except:
         conn.close()
         return "Could not query database", 400
@@ -248,7 +259,7 @@ def showRatings():
     
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Rating WHERE NetID = {netID};"
+        query = f"SELECT * FROM Rating WHERE NetID = '{netID}';"
         result = conn.execute(text(query)).fetchall()
         conn.close()
         return result, 200
@@ -283,8 +294,11 @@ def getSections():
     number = data['number']
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Section WHERE Subject = {subject} AND Number = {number} AND YearTerm = {yearTerm};"
+        query = f"SELECT * FROM Section WHERE Subject = '{subject}' AND Number = '{number}' AND YearTerm = '{yearTerm}';"
+        print(query)
         result = conn.execute(text(query)).fetchall()
+        for res in result:
+            print(res)
         conn.close()
         return result, 200
     except:
@@ -299,8 +313,8 @@ def getCourseRatings():
     primaryInstructor = data['primaryInstructor']
     try:
         conn = db.connect()
-        GPA = f"SELECT FullName, GPA FROM GPAByInstructor WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {primaryInstructor};"
-        Rating = f"SELECT NetID, Rating, Comments FROM Rating WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {primaryInstructor};"
+        GPA = f"SELECT FullName, GPA FROM GPAByInstructor WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{primaryInstructor}';"
+        Rating = f"SELECT NetID, Rating, Comments FROM Rating WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{primaryInstructor}';"
         GPA = conn.execute(text(GPA)).fetchall()
         Rating = conn.execute(text(Rating)).fetchall()
         conn.close()
