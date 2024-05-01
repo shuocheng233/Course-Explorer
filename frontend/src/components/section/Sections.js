@@ -14,17 +14,27 @@ const Sections = () => {
         const year = parseInt(searchParams.get('year'), 10)
         const number = parseInt(searchParams.get('number'), 10)
         const obj = {}
+        let count = 0
         if (term) {
             obj.term = term
+            count++
         }
         if (subject) {
             obj.subject = subject
+            count++
         }
         if (year) {
             obj.year = year
+            count++
         }
         if (number) {
-            obj.nuber = number
+            obj.number = number
+            count++
+        }
+
+        if (count < 2) {
+            setError("Please enter at least two of term, year, subject and subject number")
+            return
         }
 
         try {
@@ -62,8 +72,8 @@ const Sections = () => {
                             state: { section }
                         }} key={index}>
                             <li key={index}>
-                                Year: {section.year}, Term: {section.term}, Course Number: {section.number},
-                                Subject: {section.subject}, Primary Instructor: {section.primaryInstructor}
+                                Year: {section.Year}, Term: {section.Term}, Course Number: {section.Number},
+                                Subject: {section.Subject}, Primary Instructor: {section.PrimaryInstructor}
                             </li>
                         </Link>
                     ))}
