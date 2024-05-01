@@ -14,14 +14,14 @@ const SectionInfo = () => {
             </div>
             <div className="section-details">
                 <div className='left-box'>
-                    <p><span className='label'>Credit Hours</span><span className="value">{section.CreditHours}</span></p>
                     <p><span className="label">Description</span><span className="value">{section.Description}</span></p>
+                    <p><span className='label'>Credit Hours</span><span className="value">{section.CreditHours}</span></p>
                     <p><span className="label">Part of Term</span><span className="value">{section.PartofTerm}</span></p>
                     <p><span className="label">Enrollment Status</span><span className="value">{section.EnrollmentStatus}</span></p>
                     <p><span className="label">Primary Instructor</span><Link to="/ratings" state={{ ...section }}className="value">
                     {section.PrimaryInstructor} </Link></p>
                 </div>
-                <div className="right-box">
+                <div className='right-box'>
                     <p><span className="label">Section Info</span><span className="value">{section.SectionInfo}</span></p>
                     <p><span className="label">Degree Attributes</span><span className="value">{section.DegreeAttributes}</span></p>
                     <p><span className="label">Schedule Information</span><span className="value">{section.ScheduleInformation}</span></p>
