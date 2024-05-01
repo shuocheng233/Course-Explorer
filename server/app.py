@@ -251,18 +251,30 @@ def updateRating():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/showRatings")
+@app.route("/showRatings", methods = ["POST"])
 def showRatings():
-    global netID
-    if netID == '':
-        return "Not Logged In", 400
-    
+    print(request.json)
+    data = request.json
+    Subject = data['Subject']
+    Number = data['Number']
+    PrimaryInstructor = data['PrimaryInstructor']
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Rating WHERE NetID = '{netID}';"
+        query = f"SELECT * FROM Rating where Subject = '{Subject}' and Number = '{Number}' and PrimaryInstructor = '{PrimaryInstructor}';"
         result = conn.execute(text(query)).fetchall()
+        rating_list = []
+        for res in result:
+            item = {
+                "NetID": res[0],
+                "PrimaryInstructor": res[1],
+                "Subject": res[2],
+                "Number": res[3],
+                "Rating": res[4],
+                "Comments": res[5]
+            }
+            rating_list.append(item)
         conn.close()
-        return result, 200
+        return rating_list, 200
     except:
         conn.close()
         return "Could not query database", 400
