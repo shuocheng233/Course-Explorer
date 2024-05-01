@@ -147,16 +147,21 @@ def showFavorite():
     
 @app.route("/addFavorite", methods = ["POST"])
 def addFavorite():
-    global netID
-    if netID == "":
-        return "Not Logged In", 400
     data = request.json
+    netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
     try:
         conn = db.connect()
-        query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
+        query = f"select * from Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        res = conn.execute(text(query)).fetchall()
+        if len(res) == 0:
+            query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
+            print(query)
+        else:
+            conn.close()
+            return "OK", 200
         conn.execute(text(query))
         conn.commit()
         conn.close()
@@ -167,38 +172,14 @@ def addFavorite():
     
 @app.route("/deleteFavorite", methods = ["POST"])
 def deleteFavorite():
-    global netID
-    if netID == "":
-        return "Not Logged In", 400
     data = request.json
+    netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
     try:
         conn = db.connect()
-        query = f"DELETE FROM Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
-        conn.execute(text(query))
-        conn.commit()
-        conn.close()
-        return "OK", 200
-    except:
-        conn.close()
-        return "Could not query database", 400
-    
-@app.route("/addRating", methods = ["POST"])
-def addRating():
-    global netID
-    if netID == "":
-        return "Not Logged In", 400
-    data = request.json
-    primaryInstructor = data['primaryInstructor']
-    subject = data['subject']
-    number = data['number']
-    rating = data['rating']
-    comments = data['comments']
-    try:
-        conn = db.connect()
-        query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{rating}', '{comments}');"
+        query = f"DELETE FROM Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
         conn.execute(text(query))
         conn.commit()
         conn.close()
@@ -240,6 +221,7 @@ def updateRating():
         conn = db.connect()
         query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
         res = conn.execute(text(query)).fetchall()
+        print(res)
         if len(res) != 0:
             query = f"Update Rating set Rating = {new_rating}, Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
         else:
