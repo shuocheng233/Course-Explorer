@@ -6,30 +6,28 @@ CREATE PROCEDURE RankSection(IN FilterBy VARCHAR(50))
 
 BEGIN
     IF FilterBy = "GPA" THEN 
-        CREATE TABLE temp AS (
-            SELECT r.PrimaryInstructor, r.Subject, r.Number
-            FROM Rating r
-            NATURAL JOIN GPAByInstructor g
-            WHERE g.GPA >= (SELECT AVG(GPA) FROM GPAByInstructor)
+        CREATE TABLE IF NOT EXISTS temp AS (
+            SELECT PrimaryInstructor, Subject, Number
+            FROM GPAByInstructor
+            WHERE GPA >= (SELECT AVG(GPA) FROM GPAByInstructor)
         );
     ELSEIF FilterBy = "RATING" THEN 
-        CREATE TABLE temp AS (
-            SELECT r.PrimaryInstructor, r.Subject, r.Number
+        CREATE TABLE IF NOT EXISTS temp AS (
+            SELECT DISTINCT r.PrimaryInstructor, r.Subject, r.Number
             FROM Rating r
             NATURAL JOIN GPAByInstructor g
             WHERE r.Rating >= (SELECT AVG(Rating) FROM Rating)
         );
     ELSE
-        CREATE TABLE temp AS (
-            SELECT r.PrimaryInstructor, r.Subject, r.Number
-            FROM Rating r
-            NATURAL JOIN GPAByInstructor g
+        CREATE TABLE IF NOT EXISTS temp AS (
+            SELECT PrimaryInstructor, Subject, Number
+            FROM GPAByInstructor
         );
     END IF;
         
     SELECT * 
     FROM 
-        (SELECT PrimaryInstructor, Subject, Number, COUNT(Favorite.NetID) AS NumberOfFavorite, AVG(Rating) AS AverageRating
+        (SELECT DISTINCT PrimaryInstructor, Subject, Number, COUNT(Favorite.NetID) AS NumberOfFavorite, AVG(Rating) AS AverageRating
         FROM Favorite
         NATURAL JOIN User 
         NATURAL JOIN Rating
@@ -66,7 +64,7 @@ COMMIT TRANSACTION;
 
 ----------- Trigger -----------
 
-CREATE TRIGGER trig 
+CREATE TRIGGER RatingTrigger 
 BEFORE INSERT ON Rating
 FOR EACH ROW
     BEGIN
@@ -84,7 +82,7 @@ FOR EACH ROW
 --         THEN ROLLBACK TRANSACTION;
 --     END;
 
-CREATE TRIGGER trig 
+CREATE TRIGGER RatingTrigger 
 BEFORE INSERT ON Rating
 FOR EACH ROW
     BEGIN
@@ -103,7 +101,7 @@ FOR EACH ROW
     END;
 
 
-CREATE TRIGGER trig 
+CREATE TRIGGER RatingTrigger 
 BEFORE INSERT ON Rating
 FOR EACH ROW
     BEGIN
@@ -115,6 +113,24 @@ FOR EACH ROW
         AND Number = NEW.Number
         AND PrimaryInstructor = NEW.PrimaryInstructor) 
         THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User has already rated this class';
+ 
+        END IF;
+    END;
+
+
+
+CREATE TRIGGER RatingTrigger 
+AFTER INSERT ON Rating
+FOR EACH ROW
+    BEGIN
+        
+        IF EXIST 
+        (SELECT * FROM Rating
+        WHERE NetID = NEW.NetID
+        AND Subject = NEW.Subject
+        AND Number = NEW.Number
+        AND PrimaryInstructor = NEW.PrimaryInstructor) 
+        THEN ROLLBACK;
  
         END IF;
     END;
