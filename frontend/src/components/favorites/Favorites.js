@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import API_URLS from '../../config/config'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const Favorites = () => {
     const [courseList, setCourseList] = useState([])
     const [error, setError] = useState("")
-    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,6 +21,7 @@ const Favorites = () => {
 
                 if (res.ok) {
                     const data = await res.json()
+                    console.log(data)
                     setCourseList(data)
                 } else {
                     throw new Error("Unable to fetch favorites data.")
@@ -33,6 +33,7 @@ const Favorites = () => {
         }
 
         fetchData()
+        
     }, [])
 
     return (
@@ -40,11 +41,18 @@ const Favorites = () => {
             <h1>Favorite Courses</h1>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <ul>
-                {courseList.map((course, index) => (
-                    <li key={index} onClick={() => navigate('/ratings', course)}>
-                        {course.Subject} {course.Number} - {course.PrimaryInstructor}
-                    </li>
-                ))}
+                {courseList.map((course, index) => {
+                    console.log(course); // Log each course object right before rendering it
+                    return (
+                        <li key={index}>
+                            <Link to={'/ratings'}
+                                state={{ ...course }}
+                            >
+                                {course.Subject} {course.Number} - {course.PrimaryInstructor}
+                            </Link>
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     )
