@@ -345,26 +345,7 @@ def getSections():
     except:
         conn.close()
         return "Could not query database", 400
-    
-@app.route("/getCourseRatings", methods=['POST'])
-def getCourseRatings():
-    data = request.json
-    subject = data['subject']
-    number = data['number']
-    primaryInstructor = data['primaryInstructor']
-    try:
-        conn = db.connect()
-        GPA = f"SELECT FullName, GPA FROM GPAByInstructor WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{primaryInstructor}';"
-        Rating = f"SELECT NetID, Rating, Comments FROM Rating WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{primaryInstructor}';"
-        GPA = conn.execute(text(GPA)).fetchall()
-        Rating = conn.execute(text(Rating)).fetchall()
-        conn.close()
-        result = {"GPA": GPA, "Ratings": Rating}
-        return result, 200
-    except:
-        conn.close()
-        return "Could not query database", 400
-    
+      
 @app.route("/getRankings", methods=['POST'])
 def getRankings():
     data = request.json
