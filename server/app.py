@@ -95,7 +95,6 @@ def login():
 def signup():
     global netID
     data = request.json
-    print(data)
     netID = data['netID']
     password = data['password']
     firstName = data['firstName']
@@ -190,10 +189,8 @@ def deleteFavorite():
     
 @app.route("/deleteRating", methods = ["POST"])
 def deleteRating():
-    global netID
-    if netID == "":
-        return "Not Logged In", 400
     data = request.json
+    netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
@@ -211,6 +208,7 @@ def deleteRating():
 @app.route("/updateRating", methods = ["POST"])
 def updateRating():
     data = request.json
+    print(data)
     netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
