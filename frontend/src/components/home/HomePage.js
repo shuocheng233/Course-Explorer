@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { extractInfo } from './helpers'
+import './HomePage.css'
 
 const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -32,20 +33,21 @@ const HomePage = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className="homepage-container">
+            <form onSubmit={handleSubmit} className="homepage-form">
                 <input
                     type="text"
                     name="search"
                     id="search"
-                    placeholder="Browse For Sections"
+                    placeholder="Browse For Courses"
                     value={searchTerm}
                     onChange={handleSearchTermChange}
+                    className="homepage-input"
                     aria-describedby="searchHelp"
                 />
-                <button type="submit">Search</button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <button type="submit" className="homepage-button">Search</button>
             </form>
+            {error && <p className="error-message">{error}</p>}
         </div>
     )
 }

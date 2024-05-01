@@ -1,0 +1,41 @@
+.homepage-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    flex-direction: column;
+    align-items: center; 
+}
+
+.homepage-form {
+    width: 50%;
+    max-width: 600px; 
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.homepage-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px; 
+}
+
+.homepage-button {
+    background-color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: medium;
+    cursor: pointer;
+    color: #333;
+}
+
+.homepage-button:hover {
+    background-color: #eee; 
+}
+
+.error-message {
+    text-align: center;
+    color: red;
+}
