@@ -45,19 +45,44 @@ DELIMITER ;
 
 ---------- Transaction ----------
 
-BEGIN TRANSACTION;
+DELIMITER //
 
--- update the orders table
-UPDATE orders 
-SET status = 'shipped' 
-WHERE order_id = 123;
+CREATE PROCEDURE update_or_insert_rating(
+    IN netID VARCHAR(50),
+    IN primaryInstructor VARCHAR(50),
+    IN subject VARCHAR(20),
+    IN number INT,
+    IN new_rating INT,
+    IN new_comments VARCHAR(1000)
+)
+BEGIN
+    DECLARE res_count INT;
+    
+    SELECT COUNT(*) INTO res_count
+    FROM Rating
+    WHERE NetID = netID
+    AND PrimaryInstructor = primaryInstructor
+    AND Subject = subject
+    AND Number = number;
+    
+    START TRANSACTION;
+    
+    IF res_count > 0 THEN
+        UPDATE Rating
+        SET Rating = new_rating, Comments = new_comments
+        WHERE NetID = netID
+        AND PrimaryInstructor = primaryInstructor
+        AND Subject = subject
+        AND Number = number;
+    ELSE
+        INSERT INTO Rating (NetID, PrimaryInstructor, Subject, Number, Rating, Comments)
+        VALUES (netID, primaryInstructor, subject, number, new_rating, new_comments);
+    END IF;
+    
+    COMMIT;
+END //
 
---update the inventory table
-UPDATE inventory 
-SET quantity = quantity - 1 
-WHERE product_id = 456;
-
-COMMIT TRANSACTION;
+DELIMITER ;
 
 
 
