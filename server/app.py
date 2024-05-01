@@ -387,3 +387,27 @@ def getRankings():
         print(e)
         conn.close()
         return { "message": "Could not query database"}, 400
+    
+@app.route("/getGPA", methods=['POST'])
+def getGPA():
+    data = request.json
+    PrimaryInstructor = data['primaryInstructor']
+    subject = data['subject']
+    number = data['number']
+    try:
+        conn = db.connect()
+        query = f"SELECT GPA FROM GPAByInstructor WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {PrimaryInstructor};"
+        result = conn.execute(text(query)).fetchall()
+        section_list = []
+        for res in result:
+            item = {
+                "Subject": res[0],
+                "Number": res[1],
+                "CourseTitle": res[2]
+            }
+            section_list.append(item)
+        conn.close()
+        return result[0], 200
+    except:
+        conn.close()
+        return "Could not query database", 400
