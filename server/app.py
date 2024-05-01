@@ -218,17 +218,17 @@ def updateRating():
     try:
         
         conn = db.connect()
-        query = f"call update_or_insert_rating('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
-        conn.execute(text(query))
-        
-        # query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
-        # res = conn.execute(text(query)).fetchall()
-        # print(res)
-        # if len(res) != 0:
-        #     query = f"Update Rating set Rating = {new_rating}, Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
-        # else:
-        #     query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
+        # query = f"call update_or_insert_rating('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
         # conn.execute(text(query))
+        
+        query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        res = conn.execute(text(query)).fetchall()
+        print(res)
+        if len(res) != 0:
+            query = f"Update Rating set Rating = {new_rating}, Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        else:
+            query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
+        conn.execute(text(query))
         
         conn.commit()
         conn.close()
