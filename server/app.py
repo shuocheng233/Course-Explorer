@@ -351,14 +351,26 @@ def getRankings():
     data = request.json
     FilterBy = ""
     if "FilterBy" in data:
-        FilterBy = data.FilterBy
+        FilterBy = data['FilterBy']
     try:
         conn = db.connect()
         query = f"CALL RankSection ('{FilterBy}')"
         result = conn.execute(text(query)).fetchall()
-        conn.commit()
+        # print(result)
+        # conn.commit()
         conn.close()
-        return { "data": result}, 200
-    except:
+        rankings_list = []
+        for res in result:
+            item = {
+                "PrimaryInstructor": res[0],
+                "Subject": res[1],
+                "Number": res[2],
+                "NumberOfFavorite": res[3],
+                "AverageRating": res[4]
+            }
+            rankings_list.append(item)
+        return rankings_list, 200
+    except Exception as e:
+        print(e)
         conn.close()
         return { "message": "Could not query database"}, 400
