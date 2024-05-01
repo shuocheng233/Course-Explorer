@@ -61,7 +61,7 @@ const Ratings = ({ Subject, Number, PrimaryInstructor }) => {
             })
 
             if (res.ok) {
-                setRatings(ratings.map(rating => 
+                setRatings(ratings.map(rating =>
                     rating.NetID === netID ? {
                         ...rating,
                         Rating: ratingRef.current.value,
@@ -104,7 +104,7 @@ const Ratings = ({ Subject, Number, PrimaryInstructor }) => {
             console.error(err)
         }
     }
-    
+
     // Function to handle like or unlike
     const handleLike = async () => {
         setFavorite(!favorite)

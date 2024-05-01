@@ -235,11 +235,11 @@ def updateRating():
     if netID == "":
         return "Not Logged In", 400
     data = request.json
-    primaryInstructor = data['primaryInstructor']
-    subject = data['subject']
-    number = data['number']
-    new_rating = data['rating']
-    new_comments = data['comments']
+    primaryInstructor = data['PrimaryInstructor']
+    subject = data['Subject']
+    number = data['Number']
+    new_rating = data['Rating']
+    new_comments = data['Comments']
     try:
         conn = db.connect()
         query = f"Update Rating set Rating = '{new_rating}', Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
