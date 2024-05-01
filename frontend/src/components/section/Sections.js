@@ -67,10 +67,10 @@ const Sections = () => {
             {sectionData ? (
                 <ul>
                     {sectionData.map((section, index) => (
-                        <Link to={{
-                            pathname: "/sectionInfo",
-                            state: { section }
-                        }} key={index}>
+                        <Link to={"/sectionInfo"}
+                            state={{ section }}
+                            key={index}
+                        >
                             <li key={index}>
                                 Year: {section.Year}, Term: {section.Term}, Course Number: {section.Number},
                                 Subject: {section.Subject}, Primary Instructor: {section.PrimaryInstructor}

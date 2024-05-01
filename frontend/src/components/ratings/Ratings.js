@@ -1,15 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react'
 import API_URLS from '../../config/config'
+import { useLocation } from 'react-router-dom'
 
-const Ratings = ({ Subject, Number, PrimaryInstructor }) => {
+const Ratings = () => {
     const [ratings, setRatings] = useState([])
     const [favorite, setFavorite] = useState(false)
     const [error, setError] = useState("")
     const netID = localStorage.getItem("netID")
     const ratingRef = useRef(null)
     const commentRef = useRef(null)
+    const location = useLocation()
+    const { Subject, Number, PrimaryInstructor } = location.state
 
     useEffect(() => {
+        console.log(Subject, Number)
         const fetchData = async () => {
             try {
                 const res = await fetch(API_URLS.ratings, {
@@ -61,7 +65,7 @@ const Ratings = ({ Subject, Number, PrimaryInstructor }) => {
             })
 
             if (res.ok) {
-                setRatings(ratings.map(rating => 
+                setRatings(ratings.map(rating =>
                     rating.NetID === netID ? {
                         ...rating,
                         Rating: ratingRef.current.value,
@@ -104,7 +108,7 @@ const Ratings = ({ Subject, Number, PrimaryInstructor }) => {
             console.error(err)
         }
     }
-    
+
     // Function to handle like or unlike
     const handleLike = async () => {
         setFavorite(!favorite)

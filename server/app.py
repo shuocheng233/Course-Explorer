@@ -216,11 +216,9 @@ def deleteRating():
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
-    # rating = data['rating']
-    # comments = data['comments']
     try:
         conn = db.connect()
-        query = f"DELETE FROM Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
+        query = f"DELETE FROM Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
         conn.execute(text(query))
         conn.commit()
         conn.close()
@@ -231,10 +229,8 @@ def deleteRating():
     
 @app.route("/updateRating", methods = ["POST"])
 def updateRating():
-    global netID
-    if netID == "":
-        return "Not Logged In", 400
     data = request.json
+    netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
@@ -242,7 +238,12 @@ def updateRating():
     new_comments = data['comments']
     try:
         conn = db.connect()
-        query = f"Update Rating set Rating = '{new_rating}', Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
+        query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        res = conn.execute(text(query)).fetchall()
+        if len(res) != 0:
+            query = f"Update Rating set Rating = {new_rating}, Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        else:
+            query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
         conn.execute(text(query))
         conn.commit()
         conn.close()
@@ -253,7 +254,6 @@ def updateRating():
     
 @app.route("/showRatings", methods = ["POST"])
 def showRatings():
-    print(request.json)
     data = request.json
     Subject = data['Subject']
     Number = data['Number']
@@ -273,6 +273,7 @@ def showRatings():
                 "Comments": res[5]
             }
             rating_list.append(item)
+            print(rating_list)
         conn.close()
         return rating_list, 200
     except:
