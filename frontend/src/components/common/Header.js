@@ -33,7 +33,7 @@ const Header = () => {
 
     return (
         <header className='header'>
-            <h2 className='title'>Course Explorer</h2>
+            <a href="/home" className='title'>Course Explorer</a>
             <button className='user' onClick={toggleDropdown} aria-expanded={isDropdownVisible}>
                 <FontAwesomeIcon icon={faUser} /> {username || 'Guest'}
                 {isDropdownVisible && (

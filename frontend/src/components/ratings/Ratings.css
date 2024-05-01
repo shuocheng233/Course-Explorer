@@ -1,0 +1,124 @@
+.ratings-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.success {
+    color: green;
+    font-weight: bold;
+    background-color: #e0f8e0;
+    border: 1px solid green;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.delete-success {
+    color: red;
+    font-weight: bold;
+    background-color: #fbe2e0;
+    border: 1px solid red;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.course-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.favorite-button {
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: #fff;
+}
+
+.favorite-button.not-liked {
+    background-color: #3498db;
+}
+
+.favorite-button.liked {
+    background-color: #e74c3c;
+}
+
+.user-rating,
+.add-rating {
+    margin-bottom: 20px;
+}
+
+.user-rating h3,
+.add-rating h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.rating-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    appearance: none; /* Remove native dropdown styling */
+    background-color: #fff; /* Background color for dropdown */
+}
+
+.comment-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.update-button,
+.delete-button,
+.submit-button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+}
+
+.rating-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.rating-item h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.rating-item p {
+    margin: 0;
+    font-size: 16px;
+    color: #666;
+}

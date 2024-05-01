@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react'
 import API_URLS from '../../config/config'
 import { useLocation } from 'react-router-dom'
+import './Ratings.css'
 
 const Ratings = () => {
     const [ratings, setRatings] = useState([])
     const [favorite, setFavorite] = useState(false)
     const [error, setError] = useState("")
+    const [success, setSuccess] = useState("")
+    const [deleteSuccess, setDeleteSuccess] = useState("")
     const netID = localStorage.getItem("netID")
     const ratingRef = useRef(null)
     const commentRef = useRef(null)
@@ -26,14 +29,30 @@ const Ratings = () => {
                 if (res.ok) {
                     const data = await res.json()
                     setRatings(data)
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i].NetID === netID) {
+                } else {
+                    throw new Error("Unable to fetch ratings data.")
+                }
+
+                const favoriteResponse = await fetch(API_URLS.favorites, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ netID })
+                })
+    
+                if (favoriteResponse.ok) {
+                    const favoriteData = await favoriteResponse.json()
+                    // Check if the specific course is in the favorite data
+                    for (let i = 0; i < favoriteData.length; i++) {
+                        const course = favoriteData[i]
+                        if (course.Subject === Subject && course.Number === Number && course.PrimaryInstructor === PrimaryInstructor) {
                             setFavorite(true)
                             break
                         }
                     }
                 } else {
-                    throw new Error("Unable to fetch ratings data.")
+                    throw new Error("Unable to fetch favorite status.");
                 }
             } catch (err) {
                 setError(err.message)
@@ -47,6 +66,8 @@ const Ratings = () => {
     // Function to handle user rating submission or update
     const handleSubmit = async () => {
         setError("")
+        setSuccess("") // Clear previous success message
+        setDeleteSuccess("") // Clear previous success message
         try {
             const res = await fetch(API_URLS.updateRating, {
                 method: 'POST',
@@ -71,6 +92,7 @@ const Ratings = () => {
                         Comments: commentRef.current.value,
                     } : rating
                 ))
+                setSuccess("Rating successfully added or updated!")
             } else {
                 throw new Error("Failed to submit rating.")
             }
@@ -82,6 +104,9 @@ const Ratings = () => {
 
     // Function to handle deletion of a rating
     const handleDelete = async () => {
+        setError("")
+        setSuccess("")
+        setDeleteSuccess("")
         try {
             const res = await fetch(API_URLS.deleteRating, {
                 method: 'POST',
@@ -99,6 +124,7 @@ const Ratings = () => {
             if (res.ok) {
                 const remainingRatings = ratings.filter(rating => rating.NetID !== netID)
                 setRatings(remainingRatings)
+                setDeleteSuccess("Rating successfully deleted!")
             } else {
                 throw new Error("Failed to delete rating.")
             }
@@ -140,31 +166,43 @@ const Ratings = () => {
     const otherRatings = ratings.filter(rating => rating.NetID !== netID)
 
     return (
-        <div>
-            {error && <p>{error}</p>}
-            <h2>{Subject} {Number} - {PrimaryInstructor}</h2>
-            <button onClick={handleLike}>{favorite ? 'Unlike' : 'Like'}</button>
+        <div className="ratings-container">
+            {error && <p className="error">{error}</p>}
+            {success && <p className="success">{success}</p>}
+            {deleteSuccess && <p className="delete-success">{deleteSuccess}</p>}
+            <h2 className="course-title">{Subject} {Number} - {PrimaryInstructor}</h2>
+            <button className={`favorite-button ${favorite ? 'liked' : 'not-liked'}`} onClick={handleLike}>
+                {favorite ? 'Unlike' : 'Like'}
+            </button>
             {userRating && (
-                <div key={userRating.NetID}>
+                <div className="user-rating">
                     <h3>Your Rating:</h3>
-                    <input ref={ratingRef} defaultValue={userRating.Rating} type="number" placeholder="Your rating" />
-                    <textarea ref={commentRef} defaultValue={userRating.Comments} placeholder="Your comments"></textarea>
-                    <button onClick={() => handleSubmit()}>Update</button>
-                    <button onClick={() => handleDelete()}>Delete</button>
+                    <select className="rating-select" ref={ratingRef} defaultValue={userRating.Rating}>
+                        {[...Array(6).keys()].map(value => (
+                            <option key={value} value={value}>{value}</option>
+                        ))}
+                    </select>
+                    <textarea className="comment-input" ref={commentRef} defaultValue={userRating.Comments} placeholder="Your comments"></textarea>
+                    <button className="update-button" onClick={handleSubmit}>Update</button>
+                    <button className="delete-button" onClick={handleDelete}>Delete</button>
                 </div>
             )}
-            {otherRatings.map(rating => (
-                <div key={rating.id}>
-                    <h3>{rating.PrimaryInstructor}'s Rating:</h3>
+            {otherRatings.map((rating, index) => (
+                <div className="rating-item" key={index}>
+                    <h3>{`${rating.firstName} ${rating.lastName}`}'s Rating:</h3>
                     <p>Rating: {rating.Rating} - {rating.Comments}</p>
                 </div>
             ))}
             {!userRating && (
-                <div>
+                <div className="add-rating">
                     <h3>Add Your Rating:</h3>
-                    <input type="number" ref={ratingRef} placeholder="Enter your rating" />
-                    <textarea ref={commentRef} placeholder="Enter your comments"></textarea>
-                    <button onClick={() => handleSubmit()}>Submit</button>
+                    <select className="rating-select" ref={ratingRef}>
+                        {[...Array(6).keys()].map(value => (
+                            <option key={value} value={value}>{value}</option>
+                        ))}
+                    </select>
+                    <textarea className="comment-input" ref={commentRef} placeholder="Enter your comments"></textarea>
+                    <button className="submit-button" onClick={handleSubmit}>Submit</button>
                 </div>
             )}
         </div>

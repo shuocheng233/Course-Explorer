@@ -233,15 +233,23 @@ def updateRating():
         print(e)
         return "Could not query database", 400
     
-@app.route("/showRatings", methods = ["POST"])
-def showRatings():
+@app.route("/showRatings", methods=["POST"])
+def show_ratings():
     data = request.json
     Subject = data['Subject']
     Number = data['Number']
     PrimaryInstructor = data['PrimaryInstructor']
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Rating where Subject = '{Subject}' and Number = '{Number}' and PrimaryInstructor = '{PrimaryInstructor}';"
+        query = f"""
+            SELECT r.NetID, r.PrimaryInstructor, r.Subject, r.Number, r.Rating, r.Comments,
+                   u.FirstName, u.LastName
+            FROM Rating r
+            JOIN User u ON r.NetID = u.NetID
+            WHERE r.Subject = '{Subject}'
+              AND r.Number = '{Number}'
+              AND r.PrimaryInstructor = '{PrimaryInstructor}';
+        """
         result = conn.execute(text(query)).fetchall()
         rating_list = []
         for res in result:
@@ -251,13 +259,15 @@ def showRatings():
                 "Subject": res[2],
                 "Number": res[3],
                 "Rating": res[4],
-                "Comments": res[5]
+                "Comments": res[5],
+                "firstName": res[6],
+                "lastName": res[7]
             }
             rating_list.append(item)
-            print(rating_list)
         conn.close()
         return rating_list, 200
-    except:
+    except Exception as e:
+        print(e)
         conn.close()
         return "Could not query database", 400
     

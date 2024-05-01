@@ -21,7 +21,6 @@ const Favorites = () => {
 
                 if (res.ok) {
                     const data = await res.json()
-                    console.log(data)
                     setCourseList(data)
                 } else {
                     throw new Error("Unable to fetch favorites data.")
@@ -42,7 +41,6 @@ const Favorites = () => {
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <ul>
                 {courseList.map((course, index) => {
-                    console.log(course); // Log each course object right before rendering it
                     return (
                         <li key={index}>
                             <Link to={'/ratings'}
