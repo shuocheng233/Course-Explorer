@@ -13,6 +13,19 @@ const Sections = () => {
         const subject = searchParams.get('subject')
         const year = parseInt(searchParams.get('year'), 10)
         const number = parseInt(searchParams.get('number'), 10)
+        const obj = {}
+        if (term) {
+            obj.term = term
+        }
+        if (subject) {
+            obj.subject = subject
+        }
+        if (year) {
+            obj.year = year
+        }
+        if (number) {
+            obj.nuber = number
+        }
 
         try {
             const res = await fetch(API_URLS.section, {
@@ -20,7 +33,7 @@ const Sections = () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ year, term, number, subject })
+                body: JSON.stringify(obj)
             })
             if (res.ok) {
                 const data = await res.json()
