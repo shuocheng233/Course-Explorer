@@ -104,11 +104,6 @@ def signup():
         conn = db.connect()
         query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
         res = conn.execute(text(query))
-        # query = f"select * from User where NetID = '{netID}' and Password = '{password}';"
-        # query_results = conn.execute(text(query)).fetchall()
-        # print('results:')
-        # for x in query_results:
-        #     print(x)
         conn.commit()
         conn.close()
         return { "message": "OK"}, 200
@@ -163,6 +158,7 @@ def addFavorite():
         conn = db.connect()
         query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
         conn.execute(text(query))
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
@@ -182,6 +178,7 @@ def deleteFavorite():
         conn = db.connect()
         query = f"DELETE FROM Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
         conn.execute(text(query))
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
@@ -203,6 +200,7 @@ def addRating():
         conn = db.connect()
         query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{rating}', '{comments}');"
         conn.execute(text(query))
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
@@ -224,6 +222,7 @@ def deleteRating():
         conn = db.connect()
         query = f"DELETE FROM Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
         conn.execute(text(query))
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
@@ -245,6 +244,7 @@ def updateRating():
         conn = db.connect()
         query = f"Update Rating set Rating = '{new_rating}', Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}');"
         conn.execute(text(query))
+        conn.commit()
         conn.close()
         return "OK", 200
     except:
@@ -281,9 +281,9 @@ def getCourses():
         section_list = []
         for res in result:
             item = {
-                "PrimaryInstructor": res[1],
-                "Subject": res[2],
-                "Number": res[3]
+                "Subject": res[0],
+                "Number": res[1],
+                "CourseTitle": res[2]
             }
             section_list.append(item)
         conn.close()
@@ -295,20 +295,55 @@ def getCourses():
 @app.route("/getSections", methods=['POST'])
 def getSections():
     data = request.json
-    yearTerm = '2024-sp'
-    if "yearTerm" in data:
-        yearTerm = data['yearTerm']
-    subject = data['subject']
-    number = data['number']
+    year = 20
+    if "year" in data:
+        year = data['year']
+    term = ""
+    if "term" in data:
+        term = data['term']
+    subject = ""
+    if "subject" in data:
+        subject = data['subject']
+    number = ""
+    if "number" in data:
+        number = f"{data['number']}"
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Section WHERE Subject = '{subject}' AND Number = '{number}' AND YearTerm = '{yearTerm}';"
+        query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number = '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}';"
         print(query)
         result = conn.execute(text(query)).fetchall()
+        section_list = []
         for res in result:
-            print(res)
+            item = {
+                "CRN": res[0],
+                "YearTerm": res[1],
+                "Subject": res[2],
+                "Number": res[3],
+                "CourseTitle": res[4],
+                "Description": res[5],
+                "CreditHours": res[6],
+                "SectionInfo": res[7],
+                "DegreeAttributes": res[8],
+                "ScheduleInformation": res[9],
+                "Section": res[10],
+                "StatusCode": res[11],
+                "PartofTerm": res[12],
+                "SectionTitle": res[13],
+                "SectionCreditHours": res[14],
+                "EnrollmentStatus": res[15],
+                "Type": res[16],
+                "TypeCode": res[17],
+                "StartTime": res[18],
+                "EndTime": res[19],
+                "DaysofWeek": res[20],
+                "Room": res[21],
+                "Building": res[22],
+                "Instructors": res[23],
+                "PrimaryInstructor": res[24]
+            }
+            section_list.append(item)
         conn.close()
-        return result, 200
+        return section_list, 200
     except:
         conn.close()
         return "Could not query database", 400
