@@ -1,5 +1,5 @@
 .header {
-    background-color: transparent;
+    background-color: #f8f9fa;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -7,7 +7,7 @@
 
 .title {
     margin-left: 30px;
-    color:#0BABE0;
+    color: #007BFF;
     font-size: 24px;
 }
 

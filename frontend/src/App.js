@@ -5,6 +5,7 @@ import HomePage from './components/home/HomePage'
 import Favorites from './components/favorites/Favorites'
 import Sections from './components/section/Sections'
 import SectionInfo from './components/section/SectionInfo'
+import Ratings from './components/ratings/Ratings'
 import './App.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/sections" element={<Sections />} />
           <Route path="/sectionInfo" element={<SectionInfo />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/ratings" element={<Ratings />} />
         </Route>
       </Routes>
     </BrowserRouter>
