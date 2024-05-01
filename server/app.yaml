@@ -4,7 +4,7 @@ instance_class: F1 # this is the cheapest option
 
 env_variables:
   MYSQL_USER: "root"
-  MYSQL_PASSWORD: "********"
+  MYSQL_PASSWORD: "mx21bradtz2bl45shuoc4"
   MYSQL_DB: "db_course_explorer"
   MYSQL_HOST: 34.71.95.147
 
