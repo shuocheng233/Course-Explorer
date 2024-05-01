@@ -10,6 +10,7 @@ const API_URLS = {
     addFavorite: 'http://127.0.0.1:5000/addFavorite', // Endpoint for adding a favorite course
     deleteFavorite: 'http://127.0.0.1:5000/deleteFavorite', // Endpoint for deleting a favorite course
     getRankings: 'http://127.0.0.1:5000/getRankings', //Get course rankings using stored procedure
+    getGPA: 'http://127.0.0.1:5000/getGPA'
 }
 
 export default API_URLS

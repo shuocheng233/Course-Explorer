@@ -9,6 +9,7 @@ const Ratings = () => {
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
     const [deleteSuccess, setDeleteSuccess] = useState("")
+    const [GPA, setGPA] = useState("Unknown")
     const netID = localStorage.getItem("netID")
     const ratingRef = useRef(null)
     const commentRef = useRef(null)
@@ -53,6 +54,24 @@ const Ratings = () => {
                     }
                 } else {
                     throw new Error("Unable to fetch favorite status.");
+                }
+                const GPAres = await fetch(API_URLS.getGPA, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subject: Subject,
+                        number: Number,
+                        primaryInstructor: PrimaryInstructor
+                    })
+                })
+                if (GPAres.ok) {
+                    const GPAData = await GPAres.json()
+                    console.log(GPAData)
+                    setGPA(GPAData.GPA)
+                } else {
+                    throw new Error("Failed to get GPA.")
                 }
             } catch (err) {
                 setError(err.message)
@@ -174,6 +193,7 @@ const Ratings = () => {
             <button className={`favorite-button ${favorite ? 'liked' : 'not-liked'}`} onClick={handleLike}>
                 {favorite ? 'Unlike' : 'Like'}
             </button>
+            <h3>Average GPA: {GPA}</h3>
             {userRating && (
                 <div className="user-rating">
                     <h3>Your Rating:</h3>

@@ -393,18 +393,13 @@ def getGPA():
     number = data['number']
     try:
         conn = db.connect()
-        query = f"SELECT GPA FROM GPAByInstructor WHERE Subject = {subject} AND Number = {number} AND PrimaryInstructor = {PrimaryInstructor};"
+        query = f"SELECT GPA FROM GPAByInstructor WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{PrimaryInstructor}';"
         result = conn.execute(text(query)).fetchall()
-        section_list = []
-        for res in result:
-            item = {
-                "Subject": res[0],
-                "Number": res[1],
-                "CourseTitle": res[2]
-            }
-            section_list.append(item)
         conn.close()
-        return result[0], 200
-    except:
+        return {
+                "GPA": result[0][0]
+        }, 200
+    except Exception as e:
+        print(e)
         conn.close()
         return "Could not query database", 400
