@@ -53,7 +53,7 @@ const SignUp = () => {
                 },
                 body: JSON.stringify({ netID, password, firstName, lastName })
             })
-            const data = await res.text()
+            const data = await res.json()
             
             if (res.ok) {
                 // assume the user has been added to the database successfully
@@ -65,7 +65,7 @@ const SignUp = () => {
                 localStorage.setItem('lastName', lastName)
                 navigate('/home')
             } else {
-                setError(data)
+                setError(data.message)
             }
         } catch (error) {
             setError("Network error. Please check your connection and try again.")

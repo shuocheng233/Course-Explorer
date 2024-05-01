@@ -111,10 +111,10 @@ def signup():
         #     print(x)
         conn.commit()
         conn.close()
-        return "OK", 200
+        return { "message": "OK"}, 200
     except:
         conn.close()
-        return f"Account with NetID '{netID}' already exists", 401
+        return { "message": f"Account with NetID '{netID}' already exists"}, 401
     
 @app.route("/logout")
 def logout():
@@ -278,6 +278,14 @@ def getCourses():
         conn = db.connect()
         query = f"SELECT DISTINCT Subject, Number, CourseTitle FROM Section WHERE Subject = {subject} AND YearTerm = {yearTerm};"
         result = conn.execute(text(query)).fetchall()
+        section_list = []
+        for res in result:
+            item = {
+                "PrimaryInstructor": res[1],
+                "Subject": res[2],
+                "Number": res[3]
+            }
+            section_list.append(item)
         conn.close()
         return result, 200
     except:
