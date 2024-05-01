@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, Link } from 'react-router-dom'
+import NewSectionCard from '../common/NewSectionCard'
+import './Rankings.css'
 import API_URLS from '../../config/config'
 
 const Rankings = () => {
@@ -40,21 +42,25 @@ const Rankings = () => {
     }, [location])
 
     return (
-        <div>
-            <h1>Course Rankings</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="course-rankings-container">
+            <h1 className="course-rankings-title">Course Rankings</h1>
+            {error && <p className="error-message">{error}</p>}
             {rankings ? (
-                <ul>
+                <div className="course-rankings-list">
                     {rankings.map((section, index) => (
-                        <li key={index}>
-                            Primary Instructor: {section.PrimaryInstructor},
-                            Subject: {section.Subject}, Course Number: {section.Number}, Number Of Favorites: {section.NumberOfFavorite},
-                Average Rating: {section.AverageRating}
-                        </li>
+                        <NewSectionCard
+                            key={index}
+                            Subject={section.Subject}
+                            Number={section.Number}
+                            YearTerm={section.YearTerm}
+                            PrimaryInstructor={section.PrimaryInstructor}
+                            NumberOfFavorite={section.NumberOfFavorite}
+                            AverageRating={section.AverageRating}
+                        />
                     ))}
-                </ul>
+                </div>
             ) : (
-                <p>No data found</p>
+                <p className="no-data-message">No data found</p>
             )}
         </div>
     )

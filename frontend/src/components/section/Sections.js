@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, Link } from 'react-router-dom'
+import SectionCard from '../common/SectionCard'
 import API_URLS from '../../config/config'
+import './Sections.css'
 
 const Sections = () => {
     const { search } = useLocation()
@@ -61,25 +63,19 @@ const Sections = () => {
     }, [search])
 
     return (
-        <div>
-            <h1>Section Information</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="sections-container">
+            <h1 className="sections-title">Section Information</h1>
+            {error && <p className="error-message">{error}</p>}
             {sectionData ? (
-                <ul>
+                <ul className="sections-list">
                     {sectionData.map((section, index) => (
-                        <Link to={"/sectionInfo"}
-                            state={{ section }}
-                            key={index}
-                        >
-                            <li key={index}>
-                                Year: {section.Year}, Term: {section.Term}, Course Number: {section.Number},
-                                Subject: {section.Subject}, Primary Instructor: {section.PrimaryInstructor}
-                            </li>
-                        </Link>
+                        <li key={index} className="sections-list-item">
+                            <SectionCard {...section} />
+                        </li>
                     ))}
                 </ul>
             ) : (
-                <p>No data found</p>
+                <p className="no-data">No data found</p>
             )}
         </div>
     )

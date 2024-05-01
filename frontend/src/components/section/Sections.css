@@ -1,0 +1,33 @@
+.sections-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    
+}
+
+.sections-title {
+    font-size: 2em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    color: red;
+    text-align: center;
+}
+
+.sections-list {  
+    list-style-type: none;
+    padding: 0;
+}
+
+.sections-list-item {
+    margin-bottom: 16px;
+}
+
+.no-data {
+    color: #777;
+    text-align: center;
+    margin-top: 20px;
+}
