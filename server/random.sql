@@ -2,33 +2,77 @@
 
 DELIMITER //
 
-CREATE PROCEDURE RankSection()
+CREATE PROCEDURE RankSection(IN FilterBy VARCHAR(50))
 
 BEGIN
-
+    IF FilterBy = "GPA" THEN 
+        CREATE TABLE temp AS (
+            SELECT r.PrimaryInstructor, r.Subject, r.Number
+            FROM Rating r
+            NATURAL JOIN GPAByInstructor g
+            WHERE g.GPA >= (SELECT AVG(GPA) FROM GPAByInstructor)
+        );
+    ELSEIF FilterBy = "RATING" THEN 
+        CREATE TABLE temp AS (
+            SELECT r.PrimaryInstructor, r.Subject, r.Number
+            FROM Rating r
+            NATURAL JOIN GPAByInstructor g
+            WHERE r.Rating >= (SELECT AVG(Rating) FROM Rating)
+        );
+    ELSE
+        CREATE TABLE temp AS (
+            SELECT r.PrimaryInstructor, r.Subject, r.Number
+            FROM Rating r
+            NATURAL JOIN GPAByInstructor g
+        );
+    END IF;
+        
     SELECT * 
     FROM 
-        (SELECT CRN, CourseTitle, Subject, COUNT(*) AS NumberOfFavorite, COUNT(*), AVG(Rating) AS AverageRating
-        FROM Section
-        NATURAL JOIN Favorite
+        (SELECT PrimaryInstructor, Subject, Number, COUNT(Favorite.NetID) AS NumberOfFavorite, AVG(Rating) AS AverageRating
+        FROM Favorite
         NATURAL JOIN User 
         NATURAL JOIN Rating
         GROUP BY PrimaryInstructor, Number, Subject) a
-    ORDER BY NumberOfFavorite DESC, AverageRating DESC;
+    NATURAL JOIN temp
+    ORDER BY NumberOfFavorite DESC, AverageRating DESC
+    LIMIT 200;
+
+    DROP TABLE temp;
 
 END //
 
-DELIMITER;
+DELIMITER ;
 
 
--- 
+---------- Transaction ----------
+
+BEGIN TRANSACTION;
+
+-- update the orders table
+UPDATE orders 
+SET status = 'shipped' 
+WHERE order_id = 123;
+
+--update the inventory table
+UPDATE inventory 
+SET quantity = quantity - 1 
+WHERE product_id = 456;
+
+COMMIT TRANSACTION;
 
 
--- SELECT * FROM (
--- SELECT r.PrimaryInstructor, r.Subject, r.Number, r.Rating, r.Comments, s.CRN, g.GPA
--- FROM Rating r
--- NATURAL JOIN GPAByInstructor g
--- NATURAL JOIN Section s 
--- WHERE g.GPA >= (SELECT AVG(GPA) FROM GPAByInstructor)
--- ) a
--- ORDER BY a.GPA
+
+
+----------- Trigger -----------
+
+CREATE TRIGGER trig 
+BEFORE INSERT ON Rating
+FOR EACH ROW
+    BEGIN
+        IF NEW.NetID = OLD.NetID AND NEW.Subject = OLD.Subject AND NEW.Number = OLD.Number AND NEW.PrimaryInstructor = OLD.PrimaryInstructor 
+        THEN ;
+
+        ELSE THEN INSERT INTO Rating VALUES (NEW.NetID, NEW.PrimaryInstructor, NEW.Number, NEW.Subject, NEW.Rating, NEW.Comment);
+            
+    END;

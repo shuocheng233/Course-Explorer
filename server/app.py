@@ -382,3 +382,20 @@ def getCourseRatings():
     except:
         conn.close()
         return "Could not query database", 400
+    
+@app.route("/getRankings", methods=['POST'])
+def getRankings():
+    data = request.json
+    FilterBy = ""
+    if "FilterBy" in data:
+        FilterBy = data.FilterBy
+    try:
+        conn = db.connect()
+        query = f"CALL RankSection ('{FilterBy}')"
+        result = conn.execute(text(query)).fetchall()
+        conn.commit()
+        conn.close()
+        return { "data": result}, 200
+    except:
+        conn.close()
+        return { "message": "Could not query database"}, 400
