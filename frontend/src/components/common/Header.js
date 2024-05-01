@@ -33,7 +33,9 @@ const Header = () => {
 
     return (
         <header className='header'>
-            <h2 className='title'>Course Explorer</h2>
+            <button className='title' onClick={() => navigate('/home')}>
+                <h2>Course Explorer</h2>
+            </button>
             <button className='user' onClick={toggleDropdown} aria-expanded={isDropdownVisible}>
                 <FontAwesomeIcon icon={faUser} /> {username || 'Guest'}
                 {isDropdownVisible && (

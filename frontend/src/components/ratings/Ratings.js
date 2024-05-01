@@ -13,7 +13,6 @@ const Ratings = () => {
     const { Subject, Number, PrimaryInstructor } = location.state
 
     useEffect(() => {
-        console.log(Subject, Number)
         const fetchData = async () => {
             try {
                 const res = await fetch(API_URLS.ratings, {
@@ -113,7 +112,7 @@ const Ratings = () => {
     const handleLike = async () => {
         setFavorite(!favorite)
         try {
-            const res = await fetch(favorite ? API_URLS.addFavorite : API_URLS.deleteFavorite, {
+            const res = await fetch(!favorite ? API_URLS.addFavorite : API_URLS.deleteFavorite, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -127,7 +126,7 @@ const Ratings = () => {
             })
 
             if (!res.ok) {
-                throw new Error("Failed to update like status.")
+                throw new Error("Failed to update favorites status.")
             }
         } catch (err) {
             setError(err.message)
