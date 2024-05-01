@@ -216,7 +216,11 @@ def updateRating():
     new_rating = data['rating']
     new_comments = data['comments']
     try:
+        
         conn = db.connect()
+        # query = f"call update_or_insert_rating('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
+        # conn.execute(text(query))
+        
         query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
         res = conn.execute(text(query)).fetchall()
         print(res)
@@ -225,6 +229,7 @@ def updateRating():
         else:
             query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
         conn.execute(text(query))
+        
         conn.commit()
         conn.close()
         return "OK", 200
