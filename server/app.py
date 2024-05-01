@@ -215,6 +215,7 @@ def updateRating():
     number = data['number']
     new_rating = data['rating']
     new_comments = data['comments']
+    new_comments = new_comments.replace("'", "''")
     try:
         
         conn = db.connect()
