@@ -321,13 +321,17 @@ def getSections():
         number = f"{data['number']}"
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}';"
+        query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
         print(query)
         result = conn.execute(text(query)).fetchall()
         section_list = []
         for res in result:
+            year_item = res[1][0:4]
+            term_item = res[1][5:]
             item = {
                 "CRN": res[0],
+                "Year": year_item,
+                "Term": term_item,
                 "YearTerm": res[1],
                 "Subject": res[2],
                 "Number": res[3],
@@ -355,7 +359,6 @@ def getSections():
             }
             section_list.append(item)
         conn.close()
-        print(section_list[0])
         return section_list, 200
     except:
         conn.close()
