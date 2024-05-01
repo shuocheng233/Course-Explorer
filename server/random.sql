@@ -71,8 +71,50 @@ BEFORE INSERT ON Rating
 FOR EACH ROW
     BEGIN
         IF NEW.NetID = OLD.NetID AND NEW.Subject = OLD.Subject AND NEW.Number = OLD.Number AND NEW.PrimaryInstructor = OLD.PrimaryInstructor 
-        THEN ;
+        THEN RETURN;
+    END;
+-- INSERT INTO Rating VALUES (NEW.NetID, NEW.PrimaryInstructor, NEW.Number, NEW.Subject, NEW.Rating, NEW.Comment);
 
-        ELSE THEN INSERT INTO Rating VALUES (NEW.NetID, NEW.PrimaryInstructor, NEW.Number, NEW.Subject, NEW.Rating, NEW.Comment);
-            
+
+-- CREATE TRIGGER trig 
+-- BEFORE INSERT ON Rating
+-- FOR EACH ROW
+--     BEGIN
+--         IF NEW.NetID = OLD.NetID AND NEW.Subject = OLD.Subject AND NEW.Number = OLD.Number AND NEW.PrimaryInstructor = OLD.PrimaryInstructor 
+--         THEN ROLLBACK TRANSACTION;
+--     END;
+
+CREATE TRIGGER trig 
+BEFORE INSERT ON Rating
+FOR EACH ROW
+    BEGIN
+        DECLARE user_rating_count INT;
+        
+        SELECT COUNT(*) INTO user_rating_count
+        FROM Rating
+        WHERE NetID = NEW.NetID
+        AND Subject = NEW.Subject
+        AND Number = NEW.Number
+        AND PrimaryInstructor = NEW.PrimaryInstructor;
+ 
+        IF user_rating_count > 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User has already rated this class';
+        END IF;
+    END;
+
+
+CREATE TRIGGER trig 
+BEFORE INSERT ON Rating
+FOR EACH ROW
+    BEGIN
+        
+        IF EXIST 
+        (SELECT * FROM Rating
+        WHERE NetID = NEW.NetID
+        AND Subject = NEW.Subject
+        AND Number = NEW.Number
+        AND PrimaryInstructor = NEW.PrimaryInstructor) 
+        THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User has already rated this class';
+ 
+        END IF;
     END;
