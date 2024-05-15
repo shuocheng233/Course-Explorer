@@ -10,7 +10,6 @@ const Header = () => {
     const [username, setUsername] = useState("Guest")
     const navigate = useNavigate()
 
-    let content
     useEffect(() => {
         const firstName = localStorage.getItem('firstName')
         const lastName = localStorage.getItem('lastName')

@@ -67,7 +67,6 @@ img {
     color: #333;
 }
 
-/* Input field styling */
 input[type="text"],
 input[type="password"] {
     width: 95%;
@@ -77,7 +76,6 @@ input[type="password"] {
     border-radius: 4px;
 }
 
-/* Button styling */
 .btn {
     background-color: #0056b3;
     color: white;

@@ -4,11 +4,11 @@ import { useLocation } from 'react-router-dom'
 import './Ratings.css'
 
 const Ratings = () => {
-    const [ratings, setRatings] = useState([])
+    const [userRating, setUserRating] = useState(null)
+    const [otherRatings, setOtherRatings] = useState([])
     const [favorite, setFavorite] = useState(false)
     const [error, setError] = useState("")
     const [success, setSuccess] = useState("")
-    const [deleteSuccess, setDeleteSuccess] = useState("")
     const [GPA, setGPA] = useState("Unknown")
     const netID = localStorage.getItem("netID")
     const ratingRef = useRef(null)
@@ -29,7 +29,9 @@ const Ratings = () => {
 
                 if (res.ok) {
                     const data = await res.json()
-                    setRatings(data)
+                    const foundUserRating = data.find(rating => rating.NetID === netID)
+                    setUserRating(foundUserRating)
+                    setOtherRatings(data.filter(rating => rating.NetID !== netID))
                 } else {
                     throw new Error("Unable to fetch ratings data.")
                 }
@@ -74,19 +76,16 @@ const Ratings = () => {
                     throw new Error("Failed to get GPA.")
                 }
             } catch (err) {
-                setError(err.message)
                 console.error(err)
             }
         }
 
         fetchData()
-    }, [Subject, Number, PrimaryInstructor])
+    }, [netID, Subject, Number, PrimaryInstructor])
 
-    // Function to handle user rating submission or update
     const handleSubmit = async () => {
         setError("")
         setSuccess("") // Clear previous success message
-        setDeleteSuccess("") // Clear previous success message
         try {
             const res = await fetch(API_URLS.updateRating, {
                 method: 'POST',
@@ -104,14 +103,18 @@ const Ratings = () => {
             })
 
             if (res.ok) {
-                setRatings(ratings.map(rating =>
-                    rating.NetID === netID ? {
-                        ...rating,
-                        Rating: ratingRef.current.value,
-                        Comments: commentRef.current.value,
-                    } : rating
+                const updatedUserRating = {
+                    ...userRating,
+                    Rating: ratingRef.current.value,
+                    Comments: commentRef.current.value,
+                }
+                setUserRating(updatedUserRating)
+
+                setOtherRatings(prevRatings => prevRatings.map(r =>
+                    r.NetID === netID ? updatedUserRating : r
                 ))
-                setSuccess("Rating successfully added or updated!")
+                
+                setSuccess("Rating successfully updated!")
             } else {
                 throw new Error("Failed to submit rating.")
             }
@@ -121,11 +124,9 @@ const Ratings = () => {
         }
     }
 
-    // Function to handle deletion of a rating
     const handleDelete = async () => {
         setError("")
         setSuccess("")
-        setDeleteSuccess("")
         try {
             const res = await fetch(API_URLS.deleteRating, {
                 method: 'POST',
@@ -141,9 +142,10 @@ const Ratings = () => {
             })
 
             if (res.ok) {
-                const remainingRatings = ratings.filter(rating => rating.NetID !== netID)
-                setRatings(remainingRatings)
-                setDeleteSuccess("Rating successfully deleted!")
+                setUserRating(null)
+                setOtherRatings(prevRatings => prevRatings.filter(r => r.NetID !== netID))
+
+                setSuccess("Rating successfully deleted!")
             } else {
                 throw new Error("Failed to delete rating.")
             }
@@ -181,14 +183,10 @@ const Ratings = () => {
         }
     }
 
-    const userRating = ratings.find(rating => rating.NetID === netID)
-    const otherRatings = ratings.filter(rating => rating.NetID !== netID)
-
     return (
         <div className="ratings-container">
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            {deleteSuccess && <p className="delete-success">{deleteSuccess}</p>}
             <h2 className="course-title">{Subject} {Number} - {PrimaryInstructor}</h2>
             <button className={`favorite-button ${favorite ? 'liked' : 'not-liked'}`} onClick={handleLike}>
                 {favorite ? 'Unlike' : 'Like'}
@@ -198,7 +196,7 @@ const Ratings = () => {
                 <div className="user-rating">
                     <h3>Your Rating:</h3>
                     <select className="rating-select" ref={ratingRef} defaultValue={userRating.Rating}>
-                        {[...Array(6).keys()].map(value => (
+                        {[0, 1, 2, 3, 4, 5].map(value => (
                             <option key={value} value={value}>{value}</option>
                         ))}
                     </select>
@@ -217,7 +215,7 @@ const Ratings = () => {
                 <div className="add-rating">
                     <h3>Add Your Rating:</h3>
                     <select className="rating-select" ref={ratingRef}>
-                        {[...Array(6).keys()].map(value => (
+                        {[0, 1, 2, 3, 4, 5].map(value => (
                             <option key={value} value={value}>{value}</option>
                         ))}
                     </select>

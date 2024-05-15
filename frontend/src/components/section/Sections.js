@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import SectionCard from '../common/SectionCard'
 import API_URLS from '../../config/config'
 import './Sections.css'
@@ -10,57 +10,58 @@ const Sections = () => {
     const [sectionData, setSectionData] = useState(null)
     const [error, setError] = useState('')
 
-    const fetchData = async () => {
-        const term = searchParams.get('term')
-        const subject = searchParams.get('subject')
-        const year = parseInt(searchParams.get('year'), 10)
-        const number = parseInt(searchParams.get('number'), 10)
-        const obj = {}
-        let count = 0
-        if (term) {
-            obj.term = term
-            count++
-        }
-        if (subject) {
-            obj.subject = subject
-            count++
-        }
-        if (year) {
-            obj.year = year
-            count++
-        }
-        if (number) {
-            obj.number = number
-            count++
-        }
-
-        if (count < 2) {
-            setError("Please enter at least two of term, year, subject and subject number")
-            return
-        }
-
-        try {
-            const res = await fetch(API_URLS.section, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(obj)
-            })
-            if (res.ok) {
-                const data = await res.json()
-                setSectionData(data)
-            } else {
-                throw new Error('Failed to fetch data')
-            }
-        } catch (error) {
-            setError(error.message)
-        }
-    }
+    const term = searchParams.get('term')
+    const subject = searchParams.get('subject')
+    const year = parseInt(searchParams.get('year'), 10)
+    const number = parseInt(searchParams.get('number'), 10)
 
     useEffect(() => {
+        const fetchData = async () => {
+            const obj = {}
+            let count = 0
+            if (term) {
+                obj.term = term
+                count++
+            }
+            if (subject) {
+                obj.subject = subject
+                count++
+            }
+            if (year) {
+                obj.year = year
+                count++
+            }
+            if (number) {
+                obj.number = number
+                count++
+            }
+    
+            if (count < 2) {
+                setError("Please enter at least two of term, year, subject and subject number")
+                return
+            }
+    
+            try {
+                const res = await fetch(API_URLS.section, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(obj)
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    setSectionData(data)
+                } else {
+                    throw new Error('Failed to fetch data')
+                }
+            } catch (error) {
+                setError(error.message)
+            }
+        }
+
         fetchData()
-    }, [search])
+    }, [term, subject, year, number])
 
     return (
         <div className="sections-container">

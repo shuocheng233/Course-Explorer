@@ -34,7 +34,7 @@
     width: 200px;
     top: 100%;
     z-index: 1000;
-    margin-top: 10px; /* Space between dropdown and user button */
+    margin-top: 10px;
 }
 
 .dropdown button {

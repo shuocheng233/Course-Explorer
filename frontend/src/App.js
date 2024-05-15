@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter, Navigate, Outlet } from 'react-router-dom'
+import { Routes, Route, BrowserRouter, Outlet } from 'react-router-dom'
 import AuthPage from './components/auth/AuthPage'
 import Header from './components/common/Header'
 import HomePage from './components/home/HomePage'

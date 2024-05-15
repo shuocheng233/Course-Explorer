@@ -23,16 +23,6 @@
     margin-bottom: 10px;
 }
 
-.delete-success {
-    color: red;
-    font-weight: bold;
-    background-color: #fbe2e0;
-    border: 1px solid red;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
 .course-title {
     font-size: 24px;
     margin-bottom: 10px;
@@ -76,8 +66,8 @@
     border-radius: 5px;
     border: 1px solid #ddd;
     font-size: 16px;
-    appearance: none; /* Remove native dropdown styling */
-    background-color: #fff; /* Background color for dropdown */
+    appearance: none;
+    background-color: #fff;
 }
 
 .comment-input {
