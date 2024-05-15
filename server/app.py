@@ -51,7 +51,6 @@ def homepage():
     query = "SELECT * FROM (SELECT r.Subject, COUNT(*) AS NumberOfCourses, AVG(r.Rating) AS AverageRating, COUNT(*) AS NumberOfFavorite FROM Rating r JOIN Favorite f ON r.Subject = f.Subject GROUP BY r.Subject) a ORDER BY Subject;"
     query_results = conn.execute(text(query)).fetchall()
     conn.close()
-    print(query_results)
     ret = [{'subject':'subject','courses':'courses','average':'average','favorite':'favorite'}]
     for result in query_results:
         item = {
@@ -61,7 +60,6 @@ def homepage():
             "favorite": result[3]
         }
         ret.append(item)
-    print(ret)
     return ret
 
 @app.route("/login", methods=["POST"])
@@ -157,7 +155,6 @@ def addFavorite():
         res = conn.execute(text(query)).fetchall()
         if len(res) == 0:
             query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
-            print(query)
         else:
             conn.close()
             return "OK", 200
@@ -208,28 +205,47 @@ def deleteRating():
 @app.route("/updateRating", methods = ["POST"])
 def updateRating():
     data = request.json
-    print(data)
     netID = data['netID']
     primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
     new_rating = data['rating']
     new_comments = data['comments']
-    new_comments = new_comments.replace("'", "''")
     try:
         
         conn = db.connect()
         # query = f"call update_or_insert_rating('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
         # conn.execute(text(query))
         
-        query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+        query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}'"
         res = conn.execute(text(query)).fetchall()
-        print(res)
         if len(res) != 0:
-            query = f"Update Rating set Rating = {new_rating}, Comments = '{new_comments}' where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
+            query = text(
+                "Update Rating set Rating = :new_rating, Comments = :new_comments "
+                "where NetID = :netID and PrimaryInstructor = :primaryInstructor and "
+                "Subject = :subject and Number = :number"
+            )
+            conn.execute(query, {
+                'new_rating': new_rating, 
+                'new_comments': new_comments, 
+                'netID': netID, 
+                'primaryInstructor': primaryInstructor, 
+                'subject': subject, 
+                'number': number
+            })
         else:
-            query = f"INSERT INTO Rating VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
-        conn.execute(text(query))
+            query = text(
+                "INSERT INTO Rating (NetID, PrimaryInstructor, Subject, Number, Rating, Comments) "
+                "VALUES (:netID, :primaryInstructor, :subject, :number, :new_rating, :new_comments)"
+            )
+            conn.execute(query, {
+                'netID': netID,
+                'primaryInstructor': primaryInstructor,
+                'subject': subject,
+                'number': number,
+                'new_rating': new_rating,
+                'new_comments': new_comments
+            })
         
         conn.commit()
         conn.close()
@@ -320,7 +336,6 @@ def getSections():
     try:
         conn = db.connect()
         query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
-        print(query)
         result = conn.execute(text(query)).fetchall()
         section_list = []
         for res in result:

@@ -103,6 +103,11 @@ const Ratings = () => {
             })
 
             if (res.ok) {
+                if (!userRating) {
+                    setSuccess("Rating successfully added!")
+                } else {
+                    setSuccess("Rating successfully updated!")
+                }
                 const updatedUserRating = {
                     ...userRating,
                     Rating: ratingRef.current.value,
@@ -113,8 +118,6 @@ const Ratings = () => {
                 setOtherRatings(prevRatings => prevRatings.map(r =>
                     r.NetID === netID ? updatedUserRating : r
                 ))
-                
-                setSuccess("Rating successfully updated!")
             } else {
                 throw new Error("Failed to submit rating.")
             }
