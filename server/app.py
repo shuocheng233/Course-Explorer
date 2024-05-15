@@ -106,7 +106,7 @@ def signup():
         return { "message": "OK"}, 200
     except:
         conn.close()
-        return { "message": f"Account with NetID '{netID}' already exists"}, 401
+        return { "message": f"Account with NetID '{netID}' already exists."}, 401
     
 @app.route("/logout")
 def logout():
@@ -421,9 +421,10 @@ def getGPA():
         result = conn.execute(text(query)).fetchall()
         conn.close()
         return {
-                "GPA": result[0][0]
+                "GPA": result[0][0] if result else -1
         }, 200
     except Exception as e:
         print(e)
+        print(result)
         conn.close()
         return "Could not query database", 400

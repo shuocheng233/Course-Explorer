@@ -70,8 +70,7 @@ const Ratings = () => {
                 })
                 if (GPAres.ok) {
                     const GPAData = await GPAres.json()
-                    console.log(GPAData)
-                    setGPA(GPAData.GPA)
+                    if (GPAData.GPA >= 0) setGPA(GPAData.GPA)
                 } else {
                     throw new Error("Failed to get GPA.")
                 }
@@ -91,7 +90,7 @@ const Ratings = () => {
             setError("Comments cannot be empty.")
             return
         }
-        
+
         try {
             const res = await fetch(API_URLS.updateRating, {
                 method: 'POST',

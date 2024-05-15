@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter, Outlet } from 'react-router-dom'
+import { Routes, Route, BrowserRouter, Outlet, Navigate } from 'react-router-dom'
 import AuthPage from './components/auth/AuthPage'
 import Header from './components/common/Header'
 import HomePage from './components/home/HomePage'
@@ -10,12 +10,15 @@ import Rankings from './components/home/Rankings'
 import './App.css'
 
 function App() {
+  const netID = localStorage.getItem("netID")
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<AuthPage showLogin={true} />} />
         <Route path="/signup" element={<AuthPage showLogin={false} />} />
         <Route path="/" element={<Layout />}>
+        <Route index element={netID ? <Navigate to="/home" /> : <Navigate to="/login" />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/sections" element={<Sections />} />
           <Route path="/sectionInfo" element={<SectionInfo />} />
