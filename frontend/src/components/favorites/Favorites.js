@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import API_URLS from '../../config/config'
-import { Link } from 'react-router-dom'
+import FavoriteCard from '../common/FavoriteCard'
+import './Favorites.css'
 
 const Favorites = () => {
     const [courseList, setCourseList] = useState([])
@@ -36,22 +37,20 @@ const Favorites = () => {
     }, [])
 
     return (
-        <div>
-            <h1>Favorite Courses</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <ul>
-                {courseList.map((course, index) => {
-                    return (
-                        <li key={index}>
-                            <Link to={'/ratings'}
-                                state={{ ...course }}
-                            >
-                                {course.Subject} {course.Number} - {course.PrimaryInstructor}
-                            </Link>
+        <div className="favorites-container">
+            <h1 className="favorites-title">My Favorite Courses</h1>
+            {error && <p className="errorMessage">{error}</p>}
+            {courseList.length > 0 ? (
+                <ul className="favorites-list">
+                    {courseList.map((course, index) => (
+                        <li key={index} className="favorites-listItem">
+                            <FavoriteCard {...course} />
                         </li>
-                    );
-                })}
-            </ul>
+                    ))}
+                </ul>
+            ) : (
+                <p className="no-data">No data found</p>
+            )}
         </div>
     )
 }
