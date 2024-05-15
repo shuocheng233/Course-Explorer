@@ -86,6 +86,12 @@ const Ratings = () => {
     const handleSubmit = async () => {
         setError("")
         setSuccess("") // Clear previous success message
+
+        if (!commentRef.current.value.trim()) {
+            setError("Comments cannot be empty.")
+            return
+        }
+        
         try {
             const res = await fetch(API_URLS.updateRating, {
                 method: 'POST',

@@ -24,8 +24,10 @@
     gap: 16px;
 }
 
-.no-data-message {
-    color: #777;
+.loading-message {
+    font-size: 16px;
+    color: #505050;
     text-align: center;
     margin-top: 20px;
+    font-style: italic;
 }

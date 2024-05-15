@@ -6,6 +6,7 @@ import './HomePage.css'
 const HomePage = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [filter, setFilter] = useState("")
+    const [rankingError, setRankingError] = useState("")
     const [error, setError] = useState("")
     const navigate = useNavigate()
 
@@ -25,27 +26,30 @@ const HomePage = () => {
 
         // Filter out null or undefined values
         const cleanSection = Object.fromEntries(
-            Object.entries(section).filter(([key, value]) => value != null)
+            Object.entries(section).filter(([_, value]) => value != null)
         )
 
-        const queryParams = new URLSearchParams(cleanSection).toString()
-        
-        if (queryParams) {
+        if (Object.keys(cleanSection).length >= 2) {
+            const queryParams = new URLSearchParams(cleanSection).toString()
             navigate(`/sections?${queryParams}`)
         } else {
-            setError("No valid data to search. Please check your input and try again.")
+            setError("Please enter at least two search criteria (year, term, number, subject).")
         }
     }
 
     const handleRankingSubmit = async (e) => {
         e.preventDefault()
 
-        const filters = new URLSearchParams(filter).toString()
+        const filters = new URLSearchParams(filter.trim()).toString()
         
-        if (filters) {
-            navigate(`/rankings?${filters}`)
+        if (filter) {
+            if (filter.toLowerCase().trim() === 'gpa' || filter.toLowerCase().trim() === 'rating') {
+                navigate(`/rankings?${filters}`)
+            } else {
+                setRankingError("You must search by either GPA or Rating.")
+            }
         } else {
-            setError("No valid data to search. Please check your input and try again.")
+            setRankingError("No valid keyword to search. Please check your input and try again.")
         }
     }
 
@@ -81,6 +85,7 @@ const HomePage = () => {
                     />
                     <button type="submit" className="homepage-button">See Best Courses</button>
                 </form>
+                {rankingError && <p className="error-message">{rankingError}</p>}
             </div>
         </div>
     )

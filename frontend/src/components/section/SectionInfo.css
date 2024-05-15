@@ -66,10 +66,12 @@
     color: #333;
 }
 
-.value a {
-    color: #0056b3;
-}
-
 p {
     margin-bottom: 10px;
+}
+
+.location-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
 }

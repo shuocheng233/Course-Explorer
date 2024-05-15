@@ -336,6 +336,9 @@ def getSections():
     try:
         conn = db.connect()
         query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+        if term and year != 20:
+            query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm = '{year}-{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+            print(query)
         result = conn.execute(text(query)).fetchall()
         section_list = []
         for res in result:

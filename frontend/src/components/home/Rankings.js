@@ -60,7 +60,7 @@ const Rankings = () => {
                     ))}
                 </div>
             ) : (
-                <p className="no-data-message">No data found</p>
+                <p className="loading-message">Loading...</p>
             )}
         </div>
     )

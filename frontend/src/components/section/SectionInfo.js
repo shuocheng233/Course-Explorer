@@ -35,14 +35,14 @@ const SectionInfo = () => {
                 </div>
                 <div className='right-box'>
                     <p><span className="label">Section Info</span><span className="value">{section.SectionInfo}</span></p>
-                    <p><span className="label">Primary Instructor</span><Link to="/ratings" state={{ ...section }}className="value">
+                    <p><span className="label">Primary Instructor</span><Link to="/ratings" state={{ ...section }} className="value">
                     {section.PrimaryInstructor} </Link></p>
                     <p><span className="label">Enrollment Status</span><span className="value">{section.EnrollmentStatus}</span></p>
                     <p><span className="label">Part of Term</span><span className="value">{section.PartofTerm}</span></p>
                     
                     <p><span className="label">Time</span><span className="value">{section.StartTime} {section.EndTime ? `- ${section.EndTime}` : ''}</span></p>
                     <p><span className="label">Days</span><span className="value">{section.DaysofWeek ? section.DaysofWeek : 'N/A'}</span></p>
-                    <p><span className="label">Location</span><span className="value">{section.Room ? `${section.Room}, ${section.Building}` : 'N/A'}</span></p>
+                    <p className="location-flex"><span className="label">Location</span><span className="value">{section.Room ? `${section.Room}, ${section.Building}` : 'N/A'}</span></p>
                 </div>
             </div>
         </div>

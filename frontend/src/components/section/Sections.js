@@ -9,6 +9,7 @@ const Sections = () => {
     const searchParams = new URLSearchParams(search)
     const [sectionData, setSectionData] = useState(null)
     const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const term = searchParams.get('term')
     const subject = searchParams.get('subject')
@@ -17,29 +18,11 @@ const Sections = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const obj = {}
-            let count = 0
-            if (term) {
-                obj.term = term
-                count++
-            }
-            if (subject) {
-                obj.subject = subject
-                count++
-            }
-            if (year) {
-                obj.year = year
-                count++
-            }
-            if (number) {
-                obj.number = number
-                count++
-            }
-    
-            if (count < 2) {
-                setError("Please enter at least two of term, year, subject and subject number")
-                return
-            }
+            setLoading(true)
+            let obj = { term, subject, year, number }
+            Object.keys(obj).forEach(key => {
+                if (!obj[key]) delete obj[key]
+            })
     
             try {
                 const res = await fetch(API_URLS.section, {
@@ -57,6 +40,8 @@ const Sections = () => {
                 }
             } catch (error) {
                 setError(error.message)
+            } finally {
+                setLoading(false)
             }
         }
 
@@ -66,17 +51,23 @@ const Sections = () => {
     return (
         <div className="sections-container">
             <h1 className="sections-title">Section Information</h1>
-            {error && <p className="error-message">{error}</p>}
-            {sectionData ? (
-                <ul className="sections-list">
-                    {sectionData.map((section, index) => (
-                        <li key={index} className="sections-list-item">
-                            <SectionCard {...section} />
-                        </li>
-                    ))}
-                </ul>
+            {loading ? (
+                <p className="loading-message">Loading...</p>
             ) : (
-                <p className="no-data">No data found</p>
+                <>
+                    {error && <p className="error-message">{error}</p>}
+                    {sectionData && sectionData.length > 0 ? (
+                        <ul className="sections-list">
+                            {sectionData.map((section, index) => (
+                                <li key={index} className="sections-list-item">
+                                    <SectionCard {...section} />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        !error && <p className="no-data">No data found</p>
+                    )}
+                </>
             )}
         </div>
     )
