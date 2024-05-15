@@ -21,7 +21,7 @@ const SectionInfo = () => {
     return (
         <div className='section-info-container'>
             <div className='section-header'>
-                <h1>{section.Subject + ' ' + section.Number} - {section.CourseTitle}</h1>
+                <h1>{section.Subject + ' ' + section.Number} - {section.CourseTitle.replace('&amp;', 'and')}</h1>
                 <h3>{year + ' ' + fullTermName}</h3>
             </div>
             <div className="section-details">
