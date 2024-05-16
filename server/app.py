@@ -1,12 +1,9 @@
 # imports
-from flask import Flask, request, make_response
-import os
-import sqlalchemy
-from sqlalchemy import text
+from flask import Flask, request, send_from_directory
+import os, sys
+from sqlalchemy import create_engine, text
 from yaml import load, Loader
 from flask_cors import CORS
-
-netID = ""
 
 def init_connection_engine():
     """ initialize database setup
@@ -15,52 +12,48 @@ def init_connection_engine():
     Returns:
         pool -- a connection to GCP MySQL
     """
+    try:
+        # Detect environment: local or GCP
+        if os.environ.get('GAE_ENV', '').startswith('standard'):
+            # Running on Google App Engine
+            db_user = os.environ.get('MYSQL_USER')
+            db_pass = os.environ.get('MYSQL_PASSWORD')
+            db_name = os.environ.get('MYSQL_DB')
+            cloud_sql_connection_name = os.environ.get('MYSQL_CONNECTION_NAME')
+            return create_engine(
+                f"mysql+pymysql://{db_user}:{db_pass}@/cloudsql/{cloud_sql_connection_name}/{db_name}",
+                pool_pre_ping=True
+            )
 
+        else:
+            # Running locally
+            with open("app.yaml", 'r') as file:
+                variables = load(file, Loader=Loader)
+                env_variables = variables['env_variables']
+                for var, value in env_variables.items():
+                    os.environ[var] = value
+                    
+            return create_engine(
+                f"mysql+pymysql://{os.environ['MYSQL_USER']}:{os.environ['MYSQL_PASSWORD']}@"
+                f"{os.environ['MYSQL_HOST']}:{os.environ['MYSQL_PORT']}/{os.environ['MYSQL_DB']}",
+                pool_pre_ping=True
+            )
 
-    # detect env local or gcp
-    if os.environ.get('GAE_ENV') != 'standard':
-        try:
-            variables = load(open("app.yaml"), Loader=Loader)
-        except OSError as e:
-            print("Make sure you have the app.yaml file setup")
-            os.exit()
+    except Exception as e:
+        print(f"Error creating engine: {e}")
+        sys.exit(1)
 
-        env_variables = variables['env_variables']
-        for var in env_variables:
-            os.environ[var] = env_variables[var]
-
-    pool = sqlalchemy.create_engine(
-        sqlalchemy.engine.url.URL.create(
-            drivername="mysql+pymysql",
-            username=os.environ.get('MYSQL_USER'),
-            password=os.environ.get('MYSQL_PASSWORD'),
-            database=os.environ.get('MYSQL_DB'),
-            host=os.environ.get('MYSQL_HOST')
-        )
-    )
-    return pool
-
-
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/build')
 CORS(app)
 db = init_connection_engine()
 
-@app.route("/")
-def homepage():
-    conn = db.connect()
-    query = "SELECT * FROM (SELECT r.Subject, COUNT(*) AS NumberOfCourses, AVG(r.Rating) AS AverageRating, COUNT(*) AS NumberOfFavorite FROM Rating r JOIN Favorite f ON r.Subject = f.Subject GROUP BY r.Subject) a ORDER BY Subject;"
-    query_results = conn.execute(text(query)).fetchall()
-    conn.close()
-    ret = [{'subject':'subject','courses':'courses','average':'average','favorite':'favorite'}]
-    for result in query_results:
-        item = {
-            "subject": result[0],
-            "courses": result[1],
-            "average": result[2],
-            "favorite": result[3]
-        }
-        ret.append(item)
-    return ret
+@app.route('/<path:path>', methods=['GET'])
+def serve_static(path):
+    return send_from_directory(app.static_folder, path)
+
+@app.route('/', methods=['GET'])
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -86,8 +79,6 @@ def login():
             "lastName": query_results[0].LastName
         }, 200 
         # can also decide to return first, lastname
-
-
 
 @app.route("/signup", methods = ["POST"])
 def signup():

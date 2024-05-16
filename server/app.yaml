@@ -1,17 +1,27 @@
 runtime: python38 # or another supported version
 
+entrypoint: gunicorn -b :$PORT app:app
+
 instance_class: F1 # this is the cheapest option
 
 env_variables:
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "mx21bradtz2bl45shuoc4"
+  MYSQL_HOST: "127.0.0.1" # for local development
+  MYSQL_PORT: "3306" # for local development
   MYSQL_DB: "db_course_explorer"
-  MYSQL_HOST: 34.71.95.147
+  MYSQL_CONNECTION_NAME: "cs411-cs411114:us-central1:db-cs411114"
+
+beta_settings:
+  cloud_sql_instances: cs411-cs411114:us-central1:db-cs411114
 
 handlers:
+- url: /static
+  static_dir: ../frontend/build/static
 
-- url: /script
-  static_dir: static/script
+- url: /.*
+  script: auto
 
-- url: /styles
-  static_dir: static/styles
+automatic_scaling:
+  min_instances: 1
+  max_instances: 5
