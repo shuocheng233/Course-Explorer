@@ -2,7 +2,6 @@
 from flask import Flask, request, send_from_directory
 import os, sys
 import sqlalchemy
-import logging
 from sqlalchemy import create_engine, text
 from yaml import load, Loader
 from flask_cors import CORS, cross_origin
@@ -25,8 +24,6 @@ def init_connection_engine():
             db_name = os.environ.get('MYSQL_DB')
             cloud_sql_connection_name = os.environ.get('MYSQL_CONNECTION_NAME')
 
-            logging.info("Attempting to connect to GCP MySQL database.")
-
             # Connect using the database URL
             engine = create_engine(
                 sqlalchemy.engine.url.URL.create(
@@ -40,12 +37,6 @@ def init_connection_engine():
                 )
             )
 
-            # Test the connection by attempting to fetch a small amount of data
-            with engine.connect() as conn:
-                result = conn.execute(text("SELECT 1")).fetchone()
-                logging.info(f"Connection test successful, received: {result}")
-
-            logging.info("Connection to GCP MySQL database established.")
             return engine
 
         else:
@@ -63,14 +54,18 @@ def init_connection_engine():
             )
 
     except Exception as e:
-        logging.error(f"Error creating engine: {e}")
         sys.exit(1)
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/') # last two parameters only for local development
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 CORS(app)
 gae_env = os.environ.get('GAE_ENV', 'Not Set')
-logging.info(f"GAE_ENV: {gae_env}")
+
+# Log detailed info about incoming requests
+@app.before_request
+def log_request_info():
+    app.logger.debug('Headers: %s', request.headers)
+    app.logger.debug('Body: %s', request.get_data())
+
 
 db = init_connection_engine()
 
@@ -80,17 +75,13 @@ def serve_index():
     path_to_index = os.path.join(app.static_folder, 'index.html')
 
     try:
-        logging.info(f"Attempting to serve index.html from {path_to_index}")
-        
         # Ensure the file exists to avoid unnecessary errors
         if not os.path.exists(path_to_index):
             raise FileNotFoundError(f"No such file: {path_to_index}")
         
         response = send_from_directory(app.static_folder, 'index.html')
-        logging.info("Index.html served successfully")
         return response
     except Exception as e:
-        logging.error(f"Failed to serve index.html from {path_to_index}: {e}")
         return str(e), 500
 
 @app.route("/api/login", methods=["POST"])
@@ -102,7 +93,6 @@ def login():
     password = data['password']
     conn = db.connect()
     query = f"select * from User where NetID = '{pre_netID}' and Password = '{password}';"
-    logging.info("try logging in the user")
     try:
         query_results = conn.execute(text(query)).fetchall()
     except:
@@ -353,24 +343,41 @@ def getCourses():
 @app.route("/api/getSections", methods=['POST'])
 def getSections():
     data = request.json
-    year = 20
-    if "year" in data:
-        year = data['year']
-    term = ""
-    if "term" in data:
-        term = data['term']
-    subject = ""
-    if "subject" in data:
-        subject = data['subject']
-    number = ""
-    if "number" in data:
-        number = f"{data['number']}"
     try:
+        year = data.get('year', 0)
+        term = data.get('term', "")
+        subject = data.get('subject', "")
+        number = data.get('number', 0)
+
         conn = db.connect()
-        query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm LIKE '{year}%' AND YearTerm LIKE '%{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
-        if term and year != 20:
-            query = f"SELECT * FROM Section WHERE Subject LIKE '{subject}%' AND Number LIKE '{number}%' AND YearTerm = '{year}-{term}' ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
-            print(query)
+        conditions = []
+
+        if subject:
+            conditions.append(f"Subject = '{subject}'")
+        if number:
+            conditions.append(f"Number = {number}")
+
+        if year and term:
+            conditions.append(f"YearTerm = '{year}-{term}'")
+            query = f"SELECT * FROM Section WHERE {' AND '.join(conditions)} ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+        elif year:
+            query = (
+                f"SELECT * FROM Section WHERE {' AND '.join(conditions)} AND YearTerm = '{year}-fa' "
+                f"UNION ALL "
+                f"SELECT * FROM Section WHERE {' AND '.join(conditions)} AND YearTerm = '{year}-sp' "
+                f"ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+            )
+        elif term:
+            query = (
+                " UNION ALL ".join(
+                    f"SELECT * FROM Section WHERE {' AND '.join(conditions)} AND YearTerm = '{y}-{term}'"
+                    for y in range(2016, 2025)
+                ) +
+                " ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+            )
+        else:
+            query = f"SELECT * FROM Section WHERE {' AND '.join(conditions)} ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
+        
         result = conn.execute(text(query)).fetchall()
         section_list = []
         for res in result:

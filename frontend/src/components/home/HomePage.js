@@ -11,10 +11,12 @@ const HomePage = () => {
     const navigate = useNavigate()
 
     const handleSearchTermChange = (e) => {
+        setError("")
         setSearchTerm(e.target.value)
     }
 
     const handleFilterChange = (e) => {
+        setRankingError("")
         setFilter(e.target.value)
     }
 
@@ -69,6 +71,7 @@ const HomePage = () => {
                         id="search"
                         placeholder="Browse For Courses"
                         value={searchTerm}
+                        autoComplete='off'
                         onChange={handleSearchTermChange}
                         className="homepage-input"
                         aria-describedby="searchHelp"
@@ -85,6 +88,7 @@ const HomePage = () => {
                         id="ranking"
                         placeholder="Filter By ('GPA' or 'Rating')"
                         value={filter}
+                        autoComplete='off'
                         onChange={handleFilterChange}
                         className="homepage-input"
                         aria-describedby="searchHelp"

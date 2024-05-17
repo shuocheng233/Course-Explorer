@@ -19,7 +19,6 @@ const Rankings = () => {
                 obj = {"FilterBy": filters}
     
             try {
-                console.log(obj)
                 const res = await fetch(API_URLS.getRankings, {
                     method: 'POST',
                     headers: {

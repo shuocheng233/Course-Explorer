@@ -8,7 +8,7 @@ function extractInfo(str) {
   let year = yearMatch ? yearMatch[0] : null
 
   if (year) {
-      str = str.replace(year, "")
+      str = str.replace(new RegExp(`\\b${year}\\b`, 'g'), "")
       year = year % 100 + 2000
   }
 
@@ -16,7 +16,7 @@ function extractInfo(str) {
   let term = termMatch ? termMatch[0] : null
 
   if (term) {
-      str = str.replace(term, "")
+      str = str.replace(new RegExp(`\\b${term}\\b`, 'gi'), "")
       term = term.substring(0, 2).toLowerCase()
   }
 

@@ -25,7 +25,6 @@ const Login = () => {
         setLoading(true)
 
         try {
-            console.log("hello")
             const res = await fetch(API_URLS.login, {
                 method: 'POST',
                 headers: {
@@ -36,15 +35,12 @@ const Login = () => {
 
             if (res.ok) {
                 setError("")
-                console.log("hello world")
                 const data = await res.json()
-                console.log(data)
                 // store data in localStorage
                 localStorage.setItem('netID', netID)
                 localStorage.setItem('firstName', data.firstName)
                 localStorage.setItem('lastName', data.lastName)
                 navigate('/home') // navigate to home page on successful login
-
             } else {
                 if (res.status === 401) {
                     setError("Incorrect username or password. Please try again.")
@@ -72,6 +68,7 @@ const Login = () => {
                     id="netID"
                     name="netID"
                     value={netID}
+                    autoComplete='off'
                     onChange={handleNetIDChange}
                     placeholder="Enter your NetID"
                     required
@@ -84,6 +81,7 @@ const Login = () => {
                     id="password"
                     name="password"
                     value={password}
+                    autoComplete='off'
                     onChange={handlePasswordChange}
                     placeholder="Enter your password"
                     required
