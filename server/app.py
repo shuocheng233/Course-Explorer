@@ -1,6 +1,7 @@
 # imports
 from flask import Flask, request, send_from_directory
 import os, sys
+import sqlalchemy
 import logging
 from sqlalchemy import create_engine, text
 from yaml import load, Loader
@@ -18,16 +19,32 @@ def init_connection_engine():
     try:
         # Detect environment: local or GCP
         if os.environ.get('GAE_ENV', '').startswith('standard'):
-            # Running on Google App Engine
+             # Running on Google App Engine
             db_user = os.environ.get('MYSQL_USER')
             db_pass = os.environ.get('MYSQL_PASSWORD')
             db_name = os.environ.get('MYSQL_DB')
             cloud_sql_connection_name = os.environ.get('MYSQL_CONNECTION_NAME')
+
             logging.info("Attempting to connect to GCP MySQL database.")
+
+            # Connect using the database URL
             engine = create_engine(
-                f"mysql+pymysql://{db_user}:{db_pass}@/cloudsql/{cloud_sql_connection_name}/{db_name}",
-                pool_pre_ping=True
+                sqlalchemy.engine.url.URL.create(
+                    drivername="mysql+pymysql",
+                    username=db_user,
+                    password=db_pass,
+                    database=db_name,
+                    query={
+                        'unix_socket': f'/cloudsql/{cloud_sql_connection_name}'
+                    }
+                )
             )
+
+            # Test the connection by attempting to fetch a small amount of data
+            with engine.connect() as conn:
+                result = conn.execute(text("SELECT 1")).fetchone()
+                logging.info(f"Connection test successful, received: {result}")
+
             logging.info("Connection to GCP MySQL database established.")
             return engine
 
@@ -76,7 +93,7 @@ def serve_index():
         logging.error(f"Failed to serve index.html from {path_to_index}: {e}")
         return str(e), 500
 
-@app.route("/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"])
 @cross_origin()
 def login():
     global netID
@@ -103,7 +120,7 @@ def login():
         }, 200 
         # can also decide to return first, lastname
 
-@app.route("/signup", methods = ["POST"])
+@app.route("/api/signup", methods = ["POST"])
 @cross_origin()
 def signup():
     global netID
@@ -123,13 +140,13 @@ def signup():
         conn.close()
         return { "message": f"Account with NetID '{netID}' already exists."}, 401
     
-@app.route("/logout")
+@app.route("/api/logout")
 def logout():
     global netId
     netId = ""
     return "", 200
     
-@app.route("/showFavorite", methods = ["POST"])
+@app.route("/api/showFavorite", methods = ["POST"])
 def showFavorite():
     global netID
     data = request.json
@@ -157,7 +174,7 @@ def showFavorite():
         return "Could not query database", 400
     
     
-@app.route("/addFavorite", methods = ["POST"])
+@app.route("/api/addFavorite", methods = ["POST"])
 def addFavorite():
     data = request.json
     netID = data['netID']
@@ -181,7 +198,7 @@ def addFavorite():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/deleteFavorite", methods = ["POST"])
+@app.route("/api/deleteFavorite", methods = ["POST"])
 def deleteFavorite():
     data = request.json
     netID = data['netID']
@@ -199,7 +216,7 @@ def deleteFavorite():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/deleteRating", methods = ["POST"])
+@app.route("/api/deleteRating", methods = ["POST"])
 def deleteRating():
     data = request.json
     netID = data['netID']
@@ -217,7 +234,7 @@ def deleteRating():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/updateRating", methods = ["POST"])
+@app.route("/api/updateRating", methods = ["POST"])
 def updateRating():
     data = request.json
     netID = data['netID']
@@ -270,7 +287,7 @@ def updateRating():
         print(e)
         return "Could not query database", 400
     
-@app.route("/showRatings", methods=["POST"])
+@app.route("/api/showRatings", methods=["POST"])
 def show_ratings():
     data = request.json
     Subject = data['Subject']
@@ -308,7 +325,7 @@ def show_ratings():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/getCourses", methods=['POST'])
+@app.route("/api/getCourses", methods=['POST'])
 def getCourses():
     data = request.json
     yearTerm = '2024-sp'
@@ -333,7 +350,7 @@ def getCourses():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/getSections", methods=['POST'])
+@app.route("/api/getSections", methods=['POST'])
 def getSections():
     data = request.json
     year = 20
@@ -395,7 +412,7 @@ def getSections():
         conn.close()
         return "Could not query database", 400
       
-@app.route("/getRankings", methods=['POST'])
+@app.route("/api/getRankings", methods=['POST'])
 def getRankings():
     data = request.json
     FilterBy = ""
@@ -424,7 +441,7 @@ def getRankings():
         conn.close()
         return { "message": "Could not query database"}, 400
     
-@app.route("/getGPA", methods=['POST'])
+@app.route("/api/getGPA", methods=['POST'])
 def getGPA():
     data = request.json
     PrimaryInstructor = data['primaryInstructor']

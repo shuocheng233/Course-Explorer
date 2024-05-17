@@ -1,16 +1,18 @@
+const baseURL = "https://cs411-cs411114.uc.r.appspot.com/api"
+
 const API_URLS = {
-    login: 'http://127.0.0.1:5000/login', // Endpoint for user login requests
-    signup: 'http://127.0.0.1:5000/signup', // Endpoint for user sign up requests
-    logout: 'http://127.0.0.1:5000/logout', // Endpoint for user logout requests
-    section: 'http://127.0.0.1:5000/getSections', // Endpoint for getting a specific section
-    favorites: 'http://127.0.0.1:5000/showFavorite', // Endpoint for getting user favorite courses
-    ratings: 'http://127.0.0.1:5000/showRatings', // body: JSON.stringify({ Subject, Number, PrimaryInstructor })
-    updateRating: 'http://127.0.0.1:5000/updateRating', // Endpoint for updating a rating
-    deleteRating: 'http://127.0.0.1:5000/deleteRating', // Endpoint for deleting a rating
-    addFavorite: 'http://127.0.0.1:5000/addFavorite', // Endpoint for adding a favorite course
-    deleteFavorite: 'http://127.0.0.1:5000/deleteFavorite', // Endpoint for deleting a favorite course
-    getRankings: 'http://127.0.0.1:5000/getRankings', //Get course rankings using stored procedure
-    getGPA: 'http://127.0.0.1:5000/getGPA'
+    login: `${baseURL}/login`, // Endpoint for user login requests
+    signup: `${baseURL}/signup`, // Endpoint for user sign up requests
+    logout: `${baseURL}/logout`, // Endpoint for user logout requests
+    section: `${baseURL}/getSections`, // Endpoint for getting a specific section
+    favorites: `${baseURL}/showFavorite`, // Endpoint for getting user favorite courses
+    ratings: `${baseURL}/showRatings`, // body: JSON.stringify({ Subject, Number, PrimaryInstructor })
+    updateRating: `${baseURL}/updateRating`, // Endpoint for updating a rating
+    deleteRating: `${baseURL}/deleteRating`, // Endpoint for deleting a rating
+    addFavorite: `${baseURL}/addFavorite`, // Endpoint for adding a favorite course
+    deleteFavorite: `${baseURL}/deleteFavorite`, // Endpoint for deleting a favorite course
+    getRankings: `${baseURL}/getRankings`, //Get course rankings using stored procedure
+    getGPA: `${baseURL}/getGPA`
 }
 
 export default API_URLS

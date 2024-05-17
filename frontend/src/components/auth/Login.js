@@ -25,6 +25,7 @@ const Login = () => {
         setLoading(true)
 
         try {
+            console.log("hello")
             const res = await fetch(API_URLS.login, {
                 method: 'POST',
                 headers: {
@@ -35,6 +36,7 @@ const Login = () => {
 
             if (res.ok) {
                 setError("")
+                console.log("hello world")
                 const data = await res.json()
                 console.log(data)
                 // store data in localStorage
