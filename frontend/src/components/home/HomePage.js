@@ -21,6 +21,12 @@ const HomePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
+        // prevent regex attack
+        if (searchTerm.length > 100) {
+            setError("Invalid input. Please try again.")
+            return
+        }
+
         // section format: { year, term, number, subject }
         const section = extractInfo(searchTerm)
 
