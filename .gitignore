@@ -1,0 +1,15 @@
+.DS_Store
+*.log*
+
+/server/__pycache__/
+/server/venv/
+
+/frontend/node_modules/
+/frontend/.pnp
+/frontend/.pnp.js
+/frontend/coverage/
+/frontend/build/
+/frontend/*.env.local
+/frontend/*.env.development.local
+/frontend/*.env.test.local
+/frontend/*.env.production.local
