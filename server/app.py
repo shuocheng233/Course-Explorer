@@ -1,9 +1,12 @@
 # imports
 from flask import Flask, request, send_from_directory
 import os, sys
+import logging
 from sqlalchemy import create_engine, text
 from yaml import load, Loader
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
+
+netID = ""
 
 def init_connection_engine():
     """ initialize database setup
@@ -20,14 +23,17 @@ def init_connection_engine():
             db_pass = os.environ.get('MYSQL_PASSWORD')
             db_name = os.environ.get('MYSQL_DB')
             cloud_sql_connection_name = os.environ.get('MYSQL_CONNECTION_NAME')
-            return create_engine(
+            logging.info("Attempting to connect to GCP MySQL database.")
+            engine = create_engine(
                 f"mysql+pymysql://{db_user}:{db_pass}@/cloudsql/{cloud_sql_connection_name}/{db_name}",
                 pool_pre_ping=True
             )
+            logging.info("Connection to GCP MySQL database established.")
+            return engine
 
         else:
             # Running locally
-            with open("app.yaml", 'r') as file:
+            with open("../app.yaml", 'r') as file:
                 variables = load(file, Loader=Loader)
                 env_variables = variables['env_variables']
                 for var, value in env_variables.items():
@@ -40,22 +46,38 @@ def init_connection_engine():
             )
 
     except Exception as e:
-        print(f"Error creating engine: {e}")
+        logging.error(f"Error creating engine: {e}")
         sys.exit(1)
 
-app = Flask(__name__, static_folder='../frontend/build')
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='/') # last two parameters only for local development
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 CORS(app)
+gae_env = os.environ.get('GAE_ENV', 'Not Set')
+logging.info(f"GAE_ENV: {gae_env}")
+
 db = init_connection_engine()
 
-@app.route('/<path:path>', methods=['GET'])
-def serve_static(path):
-    return send_from_directory(app.static_folder, path)
-
 @app.route('/', methods=['GET'])
+@cross_origin()
 def serve_index():
-    return send_from_directory(app.static_folder, 'index.html')
+    path_to_index = os.path.join(app.static_folder, 'index.html')
+
+    try:
+        logging.info(f"Attempting to serve index.html from {path_to_index}")
+        
+        # Ensure the file exists to avoid unnecessary errors
+        if not os.path.exists(path_to_index):
+            raise FileNotFoundError(f"No such file: {path_to_index}")
+        
+        response = send_from_directory(app.static_folder, 'index.html')
+        logging.info("Index.html served successfully")
+        return response
+    except Exception as e:
+        logging.error(f"Failed to serve index.html from {path_to_index}: {e}")
+        return str(e), 500
 
 @app.route("/login", methods=["POST"])
+@cross_origin()
 def login():
     global netID
     data = request.json
@@ -63,6 +85,7 @@ def login():
     password = data['password']
     conn = db.connect()
     query = f"select * from User where NetID = '{pre_netID}' and Password = '{password}';"
+    logging.info("try logging in the user")
     try:
         query_results = conn.execute(text(query)).fetchall()
     except:
@@ -81,6 +104,7 @@ def login():
         # can also decide to return first, lastname
 
 @app.route("/signup", methods = ["POST"])
+@cross_origin()
 def signup():
     global netID
     data = request.json
@@ -419,3 +443,6 @@ def getGPA():
         print(result)
         conn.close()
         return "Could not query database", 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
