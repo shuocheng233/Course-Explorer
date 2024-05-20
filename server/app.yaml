@@ -1,0 +1,9 @@
+runtime: python312 # or another supported version
+
+entrypoint: gunicorn -b :$PORT server.app:app
+
+instance_class: F1 # this is the cheapest option
+
+handlers:
+  - url: /.*
+    script: auto

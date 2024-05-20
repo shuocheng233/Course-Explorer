@@ -1,5 +1,6 @@
 .DS_Store
 *.log*
+.gcloudignore
 
 /server/__pycache__/
 /server/venv/
