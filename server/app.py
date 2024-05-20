@@ -3,79 +3,32 @@ from flask import Flask, request, send_from_directory
 import os, sys
 import sqlalchemy
 from sqlalchemy import create_engine, text
-from yaml import load, Loader
+from config import Development, Production
 from flask_cors import CORS, cross_origin
 
 netID = ""
 
 def init_connection_engine():
-    """ initialize database setup
-    Takes in os variables from environment if on GCP
-    Reads in local variables that will be ignored in public repository.
-    Returns:
-        pool -- a connection to GCP MySQL
-    """
     try:
         # Detect environment: local or GCP
         if os.environ.get('GAE_ENV', '').startswith('standard'):
-             # Running on Google App Engine
-            db_user = os.environ.get('MYSQL_USER')
-            db_pass = os.environ.get('MYSQL_PASSWORD')
-            db_name = os.environ.get('MYSQL_DB')
-            cloud_sql_connection_name = os.environ.get('MYSQL_CONNECTION_NAME')
-
-            # Connect using the database URL
-            engine = create_engine(
-                sqlalchemy.engine.url.URL.create(
-                    drivername="mysql+pymysql",
-                    username=db_user,
-                    password=db_pass,
-                    database=db_name,
-                    query={
-                        'unix_socket': f'/cloudsql/{cloud_sql_connection_name}'
-                    }
-                )
-            )
-
-            return engine
-
+            # Running on Google App Engine
+            return Production.get_engine()
         else:
             # Running locally
-            with open("../app.yaml", 'r') as file:
-                variables = load(file, Loader=Loader)
-                env_variables = variables['env_variables']
-                for var, value in env_variables.items():
-                    os.environ[var] = value
-                    
-            return create_engine(
-                f"mysql+pymysql://{os.environ['MYSQL_USER']}:{os.environ['MYSQL_PASSWORD']}@"
-                f"{os.environ['MYSQL_HOST']}:{os.environ['MYSQL_PORT']}/{os.environ['MYSQL_DB']}",
-                pool_pre_ping=True
-            )
-
+            return Development.get_engine()
     except Exception as e:
-        sys.exit(1)
+        sys.exit("Failed to initialize database engine.")
 
 app = Flask(__name__, static_folder='../frontend/build', static_url_path='/') # last two parameters only for local development
 CORS(app)
-gae_env = os.environ.get('GAE_ENV', 'Not Set')
-
-# Log detailed info about incoming requests
-@app.before_request
-def log_request_info():
-    app.logger.debug('Headers: %s', request.headers)
-    app.logger.debug('Body: %s', request.get_data())
-
 
 db = init_connection_engine()
 
 @app.route('/', methods=['GET'])
-@cross_origin()
 def serve_index():
     path_to_index = os.path.join(app.static_folder, 'index.html')
-
     try:
-        # Ensure the file exists to avoid unnecessary errors
         if not os.path.exists(path_to_index):
             raise FileNotFoundError(f"No such file: {path_to_index}")
         
@@ -92,9 +45,9 @@ def login():
     pre_netID = data['netID']
     password = data['password']
     conn = db.connect()
-    query = f"select * from User where NetID = '{pre_netID}' and Password = '{password}';"
+    query = f"select * from User where NetID = :pre_netID and Password = :password"
     try:
-        query_results = conn.execute(text(query)).fetchall()
+        query_results = conn.execute(text(query), { 'pre_netID': pre_netID, 'password': password }).fetchall()
     except:
         conn.close()
         return 'QUERY FAILED', 400
@@ -121,11 +74,11 @@ def signup():
     lastName = data['lastName']
     try:
         conn = db.connect()
-        query = f"INSERT INTO User VALUES ('{netID}', '{password}', '{firstName}', '{lastName}');"
-        res = conn.execute(text(query))
+        query = f"INSERT INTO User VALUES (:netID, :password, :firstName, :lastName);"
+        res = conn.execute(text(query), { 'netID': netID, 'password': password, 'firstName': firstName, 'lastName': lastName })
         conn.commit()
         conn.close()
-        return { "message": "OK"}, 200
+        return { "message": "OK" }, 200
     except:
         conn.close()
         return { "message": f"Account with NetID '{netID}' already exists."}, 401
@@ -146,8 +99,8 @@ def showFavorite():
     
     try:
         conn = db.connect()
-        query = f"SELECT * FROM Favorite WHERE NetID = '{netID}';"
-        result = conn.execute(text(query)).fetchall()
+        query = f"SELECT * FROM Favorite WHERE NetID = :netID"
+        result = conn.execute(text(query), { 'netID': netID }).fetchall()
         favorite_list = []
         for res in result:
             item = {
@@ -173,14 +126,14 @@ def addFavorite():
     number = data['number']
     try:
         conn = db.connect()
-        query = f"select * from Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
-        res = conn.execute(text(query)).fetchall()
+        query = f"select * from Favorite where NetID = :netID and PrimaryInstructor = :primaryInstructor and Subject = :subject and Number = :number"
+        res = conn.execute(text(query), { 'netID': netID, 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number }).fetchall()
         if len(res) == 0:
-            query = f"INSERT INTO Favorite VALUES ('{netID}', '{primaryInstructor}', '{subject}', '{number}');"
+            query = f"INSERT INTO Favorite VALUES (:netID, :primaryInstructor, :subject, :number);"
         else:
             conn.close()
             return "OK", 200
-        conn.execute(text(query))
+        conn.execute(text(query), { 'netID': netID, 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number })
         conn.commit()
         conn.close()
         return "OK", 200
@@ -197,8 +150,8 @@ def deleteFavorite():
     number = data['number']
     try:
         conn = db.connect()
-        query = f"DELETE FROM Favorite where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
-        conn.execute(text(query))
+        query = f"DELETE FROM Favorite where NetID = :netID and PrimaryInstructor = :primaryInstructor and Subject = :subject and Number = :number"
+        conn.execute(text(query), { 'netID': netID, 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number })
         conn.commit()
         conn.close()
         return "OK", 200
@@ -215,8 +168,8 @@ def deleteRating():
     number = data['number']
     try:
         conn = db.connect()
-        query = f"DELETE FROM Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}';"
-        conn.execute(text(query))
+        query = f"DELETE FROM Rating where NetID = :netID and PrimaryInstructor = :primaryInstructor and Subject = :subject and Number = :number"
+        conn.execute(text(query), { 'netID': netID, 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number })
         conn.commit()
         conn.close()
         return "OK", 200
@@ -234,13 +187,9 @@ def updateRating():
     new_rating = data['rating']
     new_comments = data['comments']
     try:
-        
         conn = db.connect()
-        # query = f"call update_or_insert_rating('{netID}', '{primaryInstructor}', '{subject}', '{number}', '{new_rating}', '{new_comments}');"
-        # conn.execute(text(query))
-        
-        query = f"select * from Rating where NetID = '{netID}' and PrimaryInstructor = '{primaryInstructor}' and Subject = '{subject}' and Number = '{number}'"
-        res = conn.execute(text(query)).fetchall()
+        query = f"select * from Rating where NetID = :netID and PrimaryInstructor = :primaryInstructor and Subject = :subject and Number = :number"
+        res = conn.execute(text(query), { 'netID': netID, 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number }).fetchall()
         if len(res) != 0:
             query = text(
                 "Update Rating set Rating = :new_rating, Comments = :new_comments "
@@ -290,11 +239,11 @@ def show_ratings():
                    u.FirstName, u.LastName
             FROM Rating r
             JOIN User u ON r.NetID = u.NetID
-            WHERE r.Subject = '{Subject}'
-              AND r.Number = '{Number}'
-              AND r.PrimaryInstructor = '{PrimaryInstructor}';
+            WHERE r.Subject = :Subject
+              AND r.Number = :Number
+              AND r.PrimaryInstructor = :PrimaryInstructor
         """
-        result = conn.execute(text(query)).fetchall()
+        result = conn.execute(text(query), { 'PrimaryInstructor': PrimaryInstructor, 'Subject': Subject, 'Number': Number }).fetchall()
         rating_list = []
         for res in result:
             item = {
@@ -315,31 +264,6 @@ def show_ratings():
         conn.close()
         return "Could not query database", 400
     
-@app.route("/api/getCourses", methods=['POST'])
-def getCourses():
-    data = request.json
-    yearTerm = '2024-sp'
-    if "yearTerm" in data:
-        yearTerm = data['yearTerm']
-    subject = data['subject']
-    try:
-        conn = db.connect()
-        query = f"SELECT DISTINCT Subject, Number, CourseTitle FROM Section WHERE Subject = {subject} AND YearTerm = {yearTerm};"
-        result = conn.execute(text(query)).fetchall()
-        section_list = []
-        for res in result:
-            item = {
-                "Subject": res[0],
-                "Number": res[1],
-                "CourseTitle": res[2]
-            }
-            section_list.append(item)
-        conn.close()
-        return result, 200
-    except:
-        conn.close()
-        return "Could not query database", 400
-    
 @app.route("/api/getSections", methods=['POST'])
 def getSections():
     data = request.json
@@ -353,9 +277,9 @@ def getSections():
         conditions = []
 
         if subject:
-            conditions.append(f"Subject = '{subject}'")
+            conditions.append(f"Subject = :subject")
         if number:
-            conditions.append(f"Number = {number}")
+            conditions.append(f"Number = :number")
 
         if year and term:
             conditions.append(f"YearTerm = '{year}-{term}'")
@@ -378,7 +302,7 @@ def getSections():
         else:
             query = f"SELECT * FROM Section WHERE {' AND '.join(conditions)} ORDER BY YearTerm DESC, Subject ASC, Number ASC LIMIT 500;"
         
-        result = conn.execute(text(query)).fetchall()
+        result = conn.execute(text(query), { 'subject': subject, 'number': number }).fetchall()
         section_list = []
         for res in result:
             year_item = res[1][0:4]
@@ -427,8 +351,8 @@ def getRankings():
         FilterBy = data['FilterBy']
     try:
         conn = db.connect()
-        query = f"CALL RankSection ('{FilterBy}')"
-        result = conn.execute(text(query)).fetchall()
+        query = f"CALL RankSection (:FilterBy)"
+        result = conn.execute(text(query), { 'FilterBy': FilterBy }).fetchall()
         # print(result)
         # conn.commit()
         conn.close()
@@ -451,13 +375,13 @@ def getRankings():
 @app.route("/api/getGPA", methods=['POST'])
 def getGPA():
     data = request.json
-    PrimaryInstructor = data['primaryInstructor']
+    primaryInstructor = data['primaryInstructor']
     subject = data['subject']
     number = data['number']
     try:
         conn = db.connect()
-        query = f"SELECT GPA FROM GPAByInstructor WHERE Subject = '{subject}' AND Number = '{number}' AND PrimaryInstructor = '{PrimaryInstructor}';"
-        result = conn.execute(text(query)).fetchall()
+        query = f"SELECT GPA FROM GPAByInstructor WHERE Subject = :subject AND Number = :number AND PrimaryInstructor = :primaryInstructor"
+        result = conn.execute(text(query), { 'primaryInstructor': primaryInstructor, 'subject': subject, 'number': number }).fetchall()
         conn.close()
         return {
                 "GPA": result[0][0] if result else -1
@@ -467,6 +391,3 @@ def getGPA():
         print(result)
         conn.close()
         return "Could not query database", 400
-
-if __name__ == '__main__':
-    app.run(debug=True)

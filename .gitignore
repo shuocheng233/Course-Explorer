@@ -3,6 +3,7 @@
 
 /server/__pycache__/
 /server/venv/
+/server/.env
 
 /frontend/node_modules/
 /frontend/.pnp
