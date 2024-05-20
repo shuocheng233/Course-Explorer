@@ -1,6 +1,6 @@
 runtime: python312 # or another supported version
 
-entrypoint: gunicorn -b :$PORT server.app:app
+entrypoint: gunicorn -b :$PORT app:app
 
 instance_class: F1 # this is the cheapest option
 
