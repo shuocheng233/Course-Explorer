@@ -1,5 +1,4 @@
-// const baseURL = "https://cs411-cs411114.uc.r.appspot.com/api"
-const baseURL = "http://127.0.0.1:5000/api"
+const baseURL = 'https://cs411-cs411114.uc.r.appspot.com/api'
 
 const API_URLS = {
     login: `${baseURL}/login`, // Endpoint for user login requests

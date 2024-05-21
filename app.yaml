@@ -1,0 +1,24 @@
+runtime: python312 # or another supported version
+
+entrypoint: gunicorn -b :$PORT server.app:app
+
+instance_class: F1 # this is the cheapest option
+
+beta_settings:
+  cloud_sql_instances: cs411-cs411114:us-central1:db-cs411114
+
+handlers:
+- url: /static
+  static_dir: frontend/build/static
+
+- url: /(.*\.(json|ico|png|jpeg|txt|html|js|css))
+  static_files: frontend/build/\1
+  upload: frontend/build/.*\.(json|ico|png|jpeg|txt|html|js|css)
+
+- url: /.*
+  static_files: frontend/build/index.html
+  upload: frontend/build/index.html
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 5

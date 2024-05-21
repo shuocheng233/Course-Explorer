@@ -5,5 +5,5 @@ entrypoint: gunicorn -b :$PORT app:app
 instance_class: F1 # this is the cheapest option
 
 handlers:
-  - url: /.*
+  - url: /api/.*
     script: auto
