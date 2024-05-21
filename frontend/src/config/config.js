@@ -1,4 +1,4 @@
-const baseURL = 'https://cs411-cs411114.uc.r.appspot.com/api'
+const baseURL = process.env.REACT_APP_BASE_URL || 'https://cs411-cs411114.uc.r.appspot.com/api'
 
 const API_URLS = {
     login: `${baseURL}/login`, // Endpoint for user login requests
