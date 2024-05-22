@@ -1,6 +1,0 @@
-.gcloudignore
-_DS_store
-
-/__pycache__/
-/venv/
-/.env

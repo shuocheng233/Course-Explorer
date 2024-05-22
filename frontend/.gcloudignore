@@ -1,6 +1,0 @@
-# Dependency directories
-node_modules/
-build/
-.gitignore
-.DS_store
-.env
