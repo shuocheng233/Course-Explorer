@@ -22,6 +22,7 @@ const HomePage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setRankingError("")
 
         // prevent regex attack
         if (searchTerm.length > 100) {
@@ -47,6 +48,7 @@ const HomePage = () => {
 
     const handleRankingSubmit = async (e) => {
         e.preventDefault()
+        setError("")
 
         const filters = new URLSearchParams(filter.trim()).toString()
         
@@ -69,13 +71,14 @@ const HomePage = () => {
                         type="text"
                         name="search"
                         id="search"
-                        placeholder="Browse For Courses"
+                        placeholder="E.g. 2024 Spring CS 411"
                         value={searchTerm}
                         autoComplete='off'
                         onChange={handleSearchTermChange}
                         className="homepage-input"
                         aria-describedby="searchHelp"
                     />
+                    <small id="searchHelp">Enter course details like year, term and course code.</small>
                     <button type="submit" className="homepage-button">Search</button>
                 </form>
                 {error && <p className="error-message">{error}</p>}
@@ -86,13 +89,14 @@ const HomePage = () => {
                         type="text"
                         name="ranking"
                         id="ranking"
-                        placeholder="Filter By ('GPA' or 'Rating')"
+                        placeholder="Enter 'GPA' or 'Rating'"
                         value={filter}
                         autoComplete='off'
                         onChange={handleFilterChange}
                         className="homepage-input"
-                        aria-describedby="searchHelp"
+                        aria-describedby="rankingHelp"
                     />
+                    <small id="rankingHelp">Filter rankings by GPA or course rating.</small>
                     <button type="submit" className="homepage-button">See Best Courses</button>
                 </form>
                 {rankingError && <p className="error-message">{rankingError}</p>}
