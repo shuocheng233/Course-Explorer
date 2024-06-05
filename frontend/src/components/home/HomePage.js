@@ -78,7 +78,7 @@ const HomePage = () => {
                         className="homepage-input"
                         aria-describedby="searchHelp"
                     />
-                    <small id="searchHelp">Enter course details like year, term and course code.</small>
+                    <small className="homepage-small" id="searchHelp">Enter course details like year, term and course code.</small>
                     <button type="submit" className="homepage-button">Search</button>
                 </form>
                 {error && <p className="error-message">{error}</p>}
@@ -96,7 +96,7 @@ const HomePage = () => {
                         className="homepage-input"
                         aria-describedby="rankingHelp"
                     />
-                    <small id="rankingHelp">Filter rankings by GPA or course rating.</small>
+                    <small className="homepage-small" id="rankingHelp">Filter rankings by GPA or course rating.</small>
                     <button type="submit" className="homepage-button">See Best Courses</button>
                 </form>
                 {rankingError && <p className="error-message">{rankingError}</p>}
